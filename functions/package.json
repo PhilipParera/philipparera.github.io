@@ -1,0 +1,8 @@
+{
+    "name": "authenticateBidder",
+    "version": "1.0.0",
+    "main": "index.js",
+    "dependencies": {
+      "googleapis": "^92.0.0"
+    }
+  }
