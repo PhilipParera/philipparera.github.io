@@ -7,7 +7,7 @@ const RANGE = 'Bidder!A:F'; // Adjust based on your sheet structure (e.g., colum
 
 // Service account authentication
 const auth = new google.auth.GoogleAuth({
-  keyFile: 'D:/Personal/e-bidding-service/key-line-454113-g0-7a009921c965.json', // Path to your service account key file
+  keyFile: '/Personal/e-bidding-service/key-line-454113-g0-7a009921c965.json', // Path to your service account key file
   scopes: ['https://www.googleapis.com/auth/spreadsheets'],
 });
 
