@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            const response = await fetch('https://your-cloud-function-url/authenticateBidder', {
+            const response = await fetch('https://www.freight-ebidding.com/authenticateBidder', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ bidderId, verificationNumber }),
