@@ -1,3 +1,3 @@
 steps:
 - name: 'gcr.io/cloud-builders/gcloud'
-  args: ['functions', 'deploy', 'authenticateBidder', '--gen2', '--runtime=nodejs18', '--trigger-http', '--allow-unauthenticated', '--source=functions']
+  args: ['functions', 'deploy', 'authenticateBidder', '--gen2', '--runtime=nodejs22', '--trigger-http', '--allow-unauthenticated', '--source=functions']
