@@ -2,7 +2,8 @@
   "name": "authenticate-bidder",
   "version": "1.0.0",
   "dependencies": {
-    "googleapis": "^140.0.0"
+    "googleapis": "^140.0.0",
+    "@google-cloud/secret-manager": "^5.0.0"
   },
   "engines": {
     "node": "22"

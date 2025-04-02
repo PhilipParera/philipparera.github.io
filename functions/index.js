@@ -1,11 +1,21 @@
 const { google } = require('googleapis');
+const { SecretManagerServiceClient } = require('@google-cloud/secret-manager');
 const sheets = google.sheets('v4');
 
 const SPREADSHEET_ID = '1pLqB_HZ0Wq6525EZMrc2KEexm9P5lIpTAr2Uv_FPxHc';
 const RANGE = 'Bidder!A:F';
 
+const secretClient = new SecretManagerServiceClient();
+
+async function getKey() {
+  const [version] = await secretClient.accessSecretVersion({
+    name: 'projects/key-line-454113-g0/secrets/authenticate-bidder-key/versions/latest',
+  });
+  return JSON.parse(version.payload.data.toString());
+}
+
 const auth = new google.auth.GoogleAuth({
-  keyFile: './key-line-454113-g0-7a009921c965.json', // Relative path
+  credentials: getKey(),
   scopes: ['https://www.googleapis.com/auth/spreadsheets'],
 });
 
