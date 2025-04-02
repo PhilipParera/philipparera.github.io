@@ -9,5 +9,5 @@ steps:
         --runtime=nodejs20 \
         --trigger-http \
         --allow-unauthenticated \
-        --source=functions
+        --source=.
   dir: 'functions'
