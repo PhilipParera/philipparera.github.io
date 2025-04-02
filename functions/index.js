@@ -28,14 +28,26 @@ exports.authenticateBidder = async (req, res) => {
     return res.status(204).send('');
   }
 
+  let bidderId, verificationNumber;
   try {
-    const { bidderId, verificationNumber } = req.body;
+    // Validate JSON body
+    if (!req.body || typeof req.body !== 'object') {
+      throw new Error('Invalid JSON payload');
+    }
+    ({ bidderId, verificationNumber } = req.body);
     if (!bidderId || bidderId.length !== 12 || !verificationNumber || verificationNumber.length !== 4) {
       return res.status(400).send({
         error: 'Invalid input: Bidder ID must be 12 characters, Verification Number must be 4 characters.'
       });
     }
+  } catch (parseError) {
+    console.error('Parse Error:', parseError);
+    return res.status(400).send({
+      error: 'Invalid JSON request body'
+    });
+  }
 
+  try {
     const client = await auth.getClient();
     const response = await sheets.spreadsheets.values.get({
       auth: client,
@@ -60,12 +72,12 @@ exports.authenticateBidder = async (req, res) => {
       });
     } else if (status === 'On Hold') {
       return res.status(403).send({
-        message: 'This ID is on hold. Please contact the admin.',
+        error: 'This ID is on hold. Please contact the admin.',
         status: 'on_hold'
       });
     } else {
       return res.status(403).send({
-        message: 'This ID has not been activated. Please contact the admin.',
+        error: 'This ID has not been activated. Please contact the admin.',
         status: 'not_activated'
       });
     }
