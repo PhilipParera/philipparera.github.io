@@ -5,7 +5,7 @@ const SPREADSHEET_ID = '1pLqB_HZ0Wq6525EZMrc2KEexm9P5lIpTAr2Uv_FPxHc';
 const RANGE = 'Bidder!A:F';
 
 const auth = new google.auth.GoogleAuth({
-  keyFile: './key-line-454113-g0-b08527996dab.json', // Relative path
+  keyFile: './key-line-454113-g0-7a009921c965.json', // Relative path
   scopes: ['https://www.googleapis.com/auth/spreadsheets'],
 });
 
