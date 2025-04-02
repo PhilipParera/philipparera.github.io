@@ -13,6 +13,16 @@ const auth = new google.auth.GoogleAuth({
 
 // HTTP-triggered Cloud Function
 exports.authenticateBidder = async (req, res) => {
+  // Set CORS headers for all responses
+  res.set('Access-Control-Allow-Origin', 'https://freight-ebidding.com'); // Or '*' for all origins
+  res.set('Access-Control-Allow-Methods', 'POST, OPTIONS'); // Allow POST and OPTIONS
+  res.set('Access-Control-Allow-Headers', 'Content-Type'); // Allow Content-Type header
+
+  // Handle preflight OPTIONS request
+  if (req.method === 'OPTIONS') {
+    return res.status(204).send(''); // No content for preflight
+  }
+
   try {
     // Extract bidder ID and verification number from the POST request body
     const { bidderId, verificationNumber } = req.body;
@@ -46,7 +56,7 @@ exports.authenticateBidder = async (req, res) => {
       });
     }
 
-    // Check the bidder's status (assumed to be in column 3, e.g., 'Active' or 'On Hold')
+    // Check the bidder's status
     const status = userRow[2] || '';
     if (status === 'Active') {
       return res.status(200).send({
