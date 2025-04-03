@@ -89,7 +89,7 @@ exports.authenticateBidder = async (req, res) => {
     if (!userRow) {
       console.log('No matching user found for:', { bidderId, verificationNumber });
       return res.status(401).send({
-        error: 'Invalid credentials: Bidder ID or Verification Number is incorrect.',
+        error: 'Invalid credentials:  Bidder ID or Verification Number is incorrect.',
       });
     }
 
@@ -102,7 +102,7 @@ exports.authenticateBidder = async (req, res) => {
         message: 'Authentication successful',
         status: 'active',
       });
-    } else if (status === 'On Hold') {
+    } else if (status === 'On hold') {
       console.log('Bidder on hold:', bidderId);
       return res.status(403).send({
         error: 'This ID is on hold. Please contact the admin.',
