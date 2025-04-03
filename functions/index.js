@@ -112,7 +112,7 @@ exports.authenticateBidder = async (req, res) => {
     } else {
       console.log('Bidder not activated or unknown status:', status, 'for bidder:', bidderId);
       return res.status(403).send({
-        error: 'This ID is on hold or not activated. Contact the admin when required.',
+        error: 'This ID has not been activated. Contact the admin when required.',
         status: 'not_activated',
       });
     }
