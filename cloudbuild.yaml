@@ -4,6 +4,7 @@ steps:
   args:
     - '-c'
     - |
+      npm install
       gcloud functions deploy authenticateBidder \
         --gen2 \
         --runtime=nodejs20 \
