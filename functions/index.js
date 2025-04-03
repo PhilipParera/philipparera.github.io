@@ -92,23 +92,25 @@ exports.authenticateBidder = async (req, res) => {
       });
     }
 
-    const status = (userRow[2] || '').trim(); // Trim added
+    const status = (userRow[2] || '').trim(); // Trim removes leading/trailing spaces
     console.log('User status:', status);
 
-    if (status === 'Active') {
+    const statusLower = status.toLowerCase(); // Make comparison case-insensitive
+
+    if (statusLower === 'active') {
       console.log('Authentication successful for bidder:', bidderId);
       return res.status(200).send({
         message: 'Authentication successful',
         status: 'active',
       });
-    } else if (status === 'Hold') { // Updated casing
+    } else if (statusLower === 'hold' || statusLower === 'on hold') { // Handle both "Hold" and "On Hold"
       console.log('Bidder on hold:', bidderId);
       return res.status(403).send({
         error: 'This ID is on hold. Please contact the admin.',
         status: 'hold',
       });
     } else {
-      console.log('Bidder not activated:', bidderId);
+      console.log('Bidder not activated or unknown status:', status, 'for bidder:', bidderId);
       return res.status(403).send({
         error: 'This ID has not been activated. Please contact the admin.',
         status: 'not_activated',
