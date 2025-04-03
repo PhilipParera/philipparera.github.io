@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const verificationNumber = verificationNumberInput.value;
 
         if (bidderId.length !== 12 || verificationNumber.length !== 4) {
-            displayMessage('Bidder ID must be 12 characters and Verification Number must be 4 characters.');
+            displayMessage('Please check your entries and repeat them again.');
             return;
         }
 
