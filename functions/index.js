@@ -101,7 +101,7 @@ exports.authenticateBidder = async (req, res) => {
         message: 'Authentication successful',
         status: 'active',
       });
-    } else if (status === 'On hold') { // Updated casing
+    } else if (status === 'Hold') { // Updated casing
       console.log('Bidder on hold:', bidderId);
       return res.status(403).send({
         error: 'This ID is on hold. Please contact the admin.',
