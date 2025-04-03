@@ -10,27 +10,28 @@ document.addEventListener('DOMContentLoaded', () => {
     async function validateLogin() {
         const bidderId = bidderIdInput.value;
         const verificationNumber = verificationNumberInput.value;
-
+    
         if (bidderId.length !== 12 || verificationNumber.length !== 4) {
             displayMessage('Please check your entries and repeat them again.');
             return;
         }
-
+    
         try {
             const response = await fetch('https://us-central1-key-line-454113-g0.cloudfunctions.net/authenticateBidder', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ bidderId, verificationNumber }),
             });
-
+    
             const data = await response.json();
-
-            if (data.status === 'active') {
-                window.location.href = 'main.html'; // Redirect to main page (create this later in Phase 2)
+    
+            if (data.message === 'Authentication successful') {
+                localStorage.setItem('authToken', data.token);
+                window.location.href = 'main.html';
             } else if (data.error) {
                 displayMessage(data.error);
             } else {
-                displayMessage(data.message);
+                displayMessage('Unexpected response from server.');
             }
         } catch (error) {
             console.error('Error:', error);
