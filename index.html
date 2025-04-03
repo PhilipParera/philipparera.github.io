@@ -29,6 +29,7 @@
             width: 100%;
             max-width: 300px;
             text-align: center;
+            box-sizing: border-box;
         }
         .login-box h2 {
             color: grey;
@@ -44,10 +45,12 @@
             font-weight: bold;
             font-size: 16px;
             margin: 10px 0;
-            background-color: white;
-            padding: 10px;
-            border-radius: 5px;
             text-align: center;
+            text-shadow: 
+                -1px -1px 0 white,  
+                 1px -1px 0 white,
+                -1px  1px 0 white,
+                 1px  1px 0 white;
         }
         .contact {
             margin-top: 20px;
@@ -59,6 +62,7 @@
         @media (min-width: 768px) {
             .login-container {
                 flex-direction: row;
+                align-items: stretch;
             }
         }
     </style>
