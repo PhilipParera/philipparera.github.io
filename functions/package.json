@@ -4,7 +4,6 @@
   "dependencies": {
     "googleapis": "^140.0.0",
     "@google-cloud/secret-manager": "^5.0.0"
-    "jsonwebtoken": "^9.0.0"
   },
   "engines": {
     "node": "20"

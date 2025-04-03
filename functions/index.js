@@ -1,6 +1,5 @@
 const { google } = require('googleapis');
 const { SecretManagerServiceClient } = require('@google-cloud/secret-manager');
-const jwt = require('jsonwebtoken');
 const sheets = google.sheets('v4');
 
 const SPREADSHEET_ID = '1pLqB_HZ0Wq6525EZMrc2KEexm9P5lIpTAr2Uv_FPxHc';
@@ -15,18 +14,6 @@ async function getKey() {
     return JSON.parse(version.payload.data.toString());
   } catch (error) {
     console.error('Error fetching secret:', error.message);
-    throw error;
-  }
-}
-
-async function getJwtSecret() {
-  try {
-    const [version] = await secretClient.accessSecretVersion({
-      name: 'projects/key-line-454113-g0/secrets/jwt-secret/versions/latest', // Create this secret
-    });
-    return version.payload.data.toString();
-  } catch (error) {
-    console.error('Error fetching JWT secret:', error.message);
     throw error;
   }
 }
@@ -54,7 +41,6 @@ exports.authenticateBidder = async (req, res) => {
 
   try {
     const credentials = await getKey();
-    const jwtSecret = await getJwtSecret();
     const auth = new google.auth.GoogleAuth({
       credentials,
       scopes: ['https://www.googleapis.com/auth/spreadsheets'],
@@ -78,10 +64,8 @@ exports.authenticateBidder = async (req, res) => {
 
     const status = (userRow[2] || '').trim().toLowerCase();
     if (status === 'active') {
-      const token = jwt.sign({ bidderId }, jwtSecret, { expiresIn: '1h' });
       return res.status(200).send({
         message: 'Authentication successful',
-        token: token,
       });
     } else if (status === 'hold' || status === 'on hold') {
       return res.status(403).send({ error: 'This ID is on hold. Please contact the admin.' });
