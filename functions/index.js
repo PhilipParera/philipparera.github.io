@@ -80,8 +80,7 @@ exports.authenticateBidder = async (req, res) => {
     const rows = response.data.values || [];
     console.log('Rows fetched:', rows);
 
-    // Skip header row (assuming first row is headers) and find matching user
-    const dataRows = rows.slice(1); // Start from second row
+    const dataRows = rows.slice(1); // Skip header row
     const userRow = dataRows.find(
       (row) => row.length >= 5 && row[4] === bidderId && row[3] === verificationNumber
     );
@@ -89,11 +88,11 @@ exports.authenticateBidder = async (req, res) => {
     if (!userRow) {
       console.log('No matching user found for:', { bidderId, verificationNumber });
       return res.status(401).send({
-        error: 'Invalid credentials:  Bidder ID or Verification Number is incorrect.',
+        error: 'Invalid credentials: Bidder ID or Verification Number is incorrect.',
       });
     }
 
-    const status = userRow[2] || '';
+    const status = (userRow[2] || '').trim(); // Trim added
     console.log('User status:', status);
 
     if (status === 'Active') {
@@ -102,7 +101,7 @@ exports.authenticateBidder = async (req, res) => {
         message: 'Authentication successful',
         status: 'active',
       });
-    } else if (status === 'On hold') {
+    } else if (status === 'On hold') { // Updated casing
       console.log('Bidder on hold:', bidderId);
       return res.status(403).send({
         error: 'This ID is on hold. Please contact the admin.',
