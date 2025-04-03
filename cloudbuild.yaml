@@ -1,14 +1,20 @@
 steps:
-- name: 'gcr.io/cloud-builders/gcloud'
-  entrypoint: 'bash'
-  args:
-    - '-c'
-    - |
-      npm install
-      gcloud functions deploy authenticateBidder \
-        --gen2 \
-        --runtime=nodejs20 \
-        --trigger-http \
-        --allow-unauthenticated \
-        --source=.
-  dir: 'functions'
+  # Step 1: Install Node.js dependencies using the npm builder
+  - name: 'gcr.io/cloud-builders/npm'
+    args: ['install']
+    dir: 'functions'
+
+  # Step 2: Deploy the Cloud Function using the gcloud builder
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        gcloud functions deploy authenticateBidder \
+          --gen2 \
+          --runtime=nodejs20 \
+          --trigger-http \
+          --allow-unauthenticated \
+          --region=us-central1 \
+          --source=.
+    dir: 'functions'
