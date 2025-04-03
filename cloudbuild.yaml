@@ -7,7 +7,7 @@ steps:
       npm install
       gcloud functions deploy authenticateBidder \
         --gen2 \
-        --runtime=nodejs22 \
+        --runtime=nodejs20 \
         --trigger-http \
         --allow-unauthenticated \
         --source=.
