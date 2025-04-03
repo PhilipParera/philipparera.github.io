@@ -18,13 +18,16 @@
         }
         .login-container {
             display: flex;
+            flex-direction: column;
             gap: 20px;
+            align-items: center;
         }
         .login-box {
             background: white;
             border: 1px solid blue;
             padding: 20px;
-            width: 300px;
+            width: 100%;
+            max-width: 300px;
             text-align: center;
         }
         .login-box h2 {
@@ -39,8 +42,12 @@
         .message {
             color: red;
             font-weight: bold;
-            font-size: 14px;
+            font-size: 16px;
             margin: 10px 0;
+            background-color: white;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
         }
         .contact {
             margin-top: 20px;
@@ -48,6 +55,11 @@
         .contact a {
             color: blue;
             text-decoration: none;
+        }
+        @media (min-width: 768px) {
+            .login-container {
+                flex-direction: row;
+            }
         }
     </style>
 </head>
@@ -64,8 +76,10 @@
     </div>
     <div class="message" id="message"></div>
     <div class="contact">
-        Contact <a href="mailto:freight.ebidding@gmail.com">us</a> for any enquiry.
+        Contact <a href="/cdn-cgi/l/email-protection#c7a1b5a2aea0afb3e9a2a5aea3a3aea9a087a0aaa6aeabe9a4a8aa">us</a> for any enquiry.
     </div>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
     <script src="login.js"></script>
+    <!-- Existing inline script for Cloudflare remains unchanged -->
 </body>
 </html>
