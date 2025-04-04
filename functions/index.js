@@ -1,5 +1,6 @@
 const { google } = require('googleapis');
 const { SecretManagerServiceClient } = require('@google-cloud/secret-manager');
+const jwt = require('jsonwebtoken');
 const sheets = google.sheets('v4');
 
 const SPREADSHEET_ID = '1pLqB_HZ0Wq6525EZMrc2KEexm9P5lIpTAr2Uv_FPxHc';
@@ -19,6 +20,18 @@ async function getKey() {
     return credentials;
   } catch (error) {
     console.error('Error fetching or parsing secret:', error.message);
+    throw error;
+  }
+}
+
+async function getJwtSecret() {
+  try {
+    const [version] = await secretClient.accessSecretVersion({
+      name: 'projects/key-line-454113-g0/secrets/jwt-secret-key/versions/latest',
+    });
+    return version.payload.data.toString();
+  } catch (error) {
+    console.error('Error fetching JWT secret:', error.message);
     throw error;
   }
 }
@@ -80,8 +93,7 @@ exports.authenticateBidder = async (req, res) => {
     const rows = response.data.values || [];
     console.log('Rows fetched:', rows);
 
-    // Skip header row (assuming first row is headers) and find matching user
-    const dataRows = rows.slice(1); // Start from second row
+    const dataRows = rows.slice(1);
     const userRow = dataRows.find(
       (row) => row.length >= 5 && row[4] === bidderId && row[3] === verificationNumber
     );
@@ -98,9 +110,11 @@ exports.authenticateBidder = async (req, res) => {
 
     if (status === 'Active') {
       console.log('Authentication successful for bidder:', bidderId);
+      const jwtSecret = await getJwtSecret();
+      const token = jwt.sign({ bidderId }, jwtSecret, { expiresIn: '30m' });
       return res.status(200).send({
         message: 'Authentication successful',
-        status: 'active',
+        token: token,
       });
     } else if (status === 'Hold') {
       console.log('Bidder on hold:', bidderId);
