@@ -23,11 +23,12 @@ document.addEventListener('DOMContentLoaded', () => {
         body: JSON.stringify({ bidderId, verificationNumber }),
       });
 
-      console.log('Response status:', response.status); // Log status
+      console.log('Response status:', response.status);
       const data = await response.json();
-      console.log('Response data:', data); // Log parsed data
+      console.log('Response data:', data);
 
       if (response.ok && data.message === 'Authentication successful') {
+        localStorage.setItem('jwtToken', data.token);
         window.location.href = 'main.html';
       } else if (data.error) {
         displayMessage(data.error);
