@@ -27,7 +27,7 @@ async function getKey() {
 async function getJwtSecret() {
   try {
     const [version] = await secretClient.accessSecretVersion({
-      name: 'projects/key-line-454113-g0/secrets/jwt-secret-key/versions/latest',
+      name: 'projects/key-line-454113-g0/secrets/jwt-secret/versions/latest',
     });
     return version.payload.data.toString();
   } catch (error) {
