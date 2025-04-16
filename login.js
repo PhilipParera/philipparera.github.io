@@ -29,6 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (response.ok && data.message === 'Authentication successful') {
         localStorage.setItem('jwtToken', data.token);
+        localStorage.setItem('bidderId', bidderId);  // Store Bidder ID in localStorage
         window.location.href = 'main.html';
       } else if (data.error) {
         displayMessage(data.error);
