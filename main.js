@@ -12,21 +12,38 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Handle submit button click
       document.getElementById('submit-bid').addEventListener('click', () => {
-          const bidderId = localStorage.getItem('bidderId');
-          const shipmentCode = document.getElementById('shipment-code').textContent;
-          const bidValue = document.getElementById('bid-value').value;
-
-          if (!bidValue) {
-              alert('Please enter a bid value.');
-              return;
-          }
-
-          const confirmation = confirm('I have read and acknowledge the FAQ page, and I am bidding for this shipment now.');
-          if (confirmation) {
-              // Google Form prefilled URL with actual entry IDs (replace with your form's entry IDs)
-              const formUrl = `https://docs.google.com/forms/d/e/1FAIpQLSfU6sD1MdKUT4TDxWKHtI-bosEg_eJui4-8FNHXh-1Y0z8wXQ/viewform?entry.1458778927=${bidderId}&entry.1274113256=${encodeURIComponent(shipmentCode)}&entry.1889331960=${bidValue}`;
-              window.open(formUrl, '_blank');
-          }
+        const bidderId = localStorage.getItem('bidderId');
+        const shipmentCode = document.getElementById('shipment-code').textContent;
+        const bidValue = document.getElementById('bid-value').value;
+      
+        if (!bidValue) {
+          alert('Please enter a bid value.');
+          return;
+        }
+      
+        const confirmation = confirm('I have read and acknowledge the FAQ page, and I am bidding for this shipment now.');
+        if (confirmation) {
+          const webAppUrl = 'https://script.google.com/macros/s/AKfycbylMWTwXMLIkUt-RjOczWZYRyh5gxWDoO5dT2jw0RE2dwOZfFpDpXSMA9A8a2l_CR3p/exec'; // Replace with your web app URL
+          const data = {
+            bidderId: bidderId,
+            shipmentCode: shipmentCode,
+            bidValue: bidValue
+          };
+      
+          fetch(webAppUrl, {
+            method: 'POST',
+            mode: 'no-cors', // Required because the script doesn’t return CORS headers
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: new URLSearchParams(data)
+          })
+          .then(() => {
+            alert('Bid submitted successfully.');
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while submitting the bid.');
+          });
+        }
       });
-  }
-});
