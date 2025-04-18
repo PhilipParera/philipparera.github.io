@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
           const confirmation = confirm('I have read and acknowledge the FAQ page, and I am bidding for this shipment now.');
           if (confirmation) {
               // Google Form prefilled URL with actual entry IDs (replace with your form's entry IDs)
-              const formUrl = `https://docs.google.com/forms/d/e/1FAIpQLSfU6sD1MdKUT4TDxWKHtI-bosEg_eJui4-8FNHXh-1Y0z8wXQ/viewform?entry.632683554=${bidderId}&entry.366859423=${encodeURIComponent(shipmentCode)}&entry.1991820702=${bidValue}`;
+              const formUrl = `https://docs.google.com/forms/d/e/1FAIpQLSfU6sD1MdKUT4TDxWKHtI-bosEg_eJui4-8FNHXh-1Y0z8wXQ/viewform?entry.1458778927=${bidderId}&entry.1274113256=${encodeURIComponent(shipmentCode)}&entry.1889331960=${bidValue}`;
               window.open(formUrl, '_blank');
           }
       });
