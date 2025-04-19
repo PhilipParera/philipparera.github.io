@@ -1,3 +1,4 @@
+const functions = require('@google-cloud/functions-framework');
 const { google } = require('googleapis');
 const { SecretManagerServiceClient } = require('@google-cloud/secret-manager');
 const jwt = require('jsonwebtoken');
@@ -36,7 +37,7 @@ async function getJwtSecret() {
   }
 }
 
-exports.getShipmentCodes = async (req, res) => {
+functions.http('getShipmentCodes', async (req, res) => {
   console.log('Request received:', req.method);
   res.set('Access-Control-Allow-Origin', 'https://www.freight-ebidding.com');
   res.set('Access-Control-Allow-Methods', 'GET, OPTIONS');
@@ -93,4 +94,4 @@ exports.getShipmentCodes = async (req, res) => {
       error: 'Internal server error',
     });
   }
-};cd
+});
