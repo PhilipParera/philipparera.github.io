@@ -10,6 +10,12 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('bidder-id-display').textContent = `Bidder ID: ${maskedId}`;
     }
 
+    // Display user name
+    const userName = localStorage.getItem('userName');
+    if (userName) {
+      document.getElementById('user-name').textContent = userName;
+    }
+
     // Get the bid value input element
     const bidValueInput = document.getElementById('bid-value');
 

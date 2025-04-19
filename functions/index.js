@@ -115,6 +115,7 @@ exports.authenticateBidder = async (req, res) => {
       return res.status(200).send({
         message: 'Authentication successful',
         token: token,
+        name: userRow[1] // Add name from column B (index 1)
       });
     } else if (status === 'Hold') {
       console.log('Bidder on hold:', bidderId);
