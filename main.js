@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('user-name').textContent = userName;
     }
 
-    // Fetch shipment codes
+    // Fetch shipments
     fetch('https://us-central1-key-line-454113-g0.cloudfunctions.net/getShipmentCodes', {
       method: 'GET',
       headers: {
@@ -25,20 +25,30 @@ document.addEventListener('DOMContentLoaded', () => {
     })
     .then(response => {
       if (!response.ok) {
-        throw new Error('Failed to fetch shipment codes');
+        throw new Error('Failed to fetch shipments');
       }
       return response.json();
     })
     .then(data => {
-      const shipmentCodes = data.shipmentCodes;
+      const shipments = data.shipments;
       const tbody = document.querySelector('#bid-table tbody');
-      shipmentCodes.forEach(code => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td><input type="number" class="bid-input" data-shipment-code="${code}" placeholder="Enter your bid"></td>
-          <td>${code}</td>
+      shipments.forEach(shipment => {
+        const target = shipment.target || 'N/A';
+        const firstId = maskId(shipment.firstId);
+        const secondId = maskId(shipment.secondId);
+        const row1 = document.createElement('tr');
+        row1.innerHTML = `
+          <td rowspan="3"><input type="number" class="bid-input" data-shipment-code="${shipment.shipmentCode}" placeholder="Enter your bid"></td>
+          <td>${target}</td>
+          <td rowspan="3">${shipment.shipmentCode}</td>
         `;
-        tbody.appendChild(row);
+        const row2 = document.createElement('tr');
+        row2.innerHTML = `<td>${firstId}</td>`;
+        const row3 = document.createElement('tr');
+        row3.innerHTML = `<td>${secondId}</td>`;
+        tbody.appendChild(row1);
+        tbody.appendChild(row2);
+        tbody.appendChild(row3);
       });
       // Add event listeners to bid inputs
       const bidInputs = document.querySelectorAll('.bid-input');
@@ -58,9 +68,16 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     })
     .catch(error => {
-      console.error('Error fetching shipment codes:', error);
-      alert('Failed to load shipment codes. Please try again later.');
+      console.error('Error fetching shipments:', error);
+      alert('Failed to load shipments. Please try again later.');
     });
+  }
+
+  function maskId(id) {
+    if (id && id.length === 12) {
+      return id.slice(0, 4) + '****' + id.slice(8);
+    }
+    return id || 'N/A';
   }
 
   function submitBid(shipmentCode, bidValue, input) {
