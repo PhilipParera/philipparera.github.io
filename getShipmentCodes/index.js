@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 const sheets = google.sheets('v4');
 
 const SPREADSHEET_ID = '11coHdDHo0ZXYFVVNTBXUfklxXDFh3dACDhyv_L3shgQ';
-const RANGE = 'Data!A2:A';
+const RANGE = 'Data!A2:K'; // Fetch columns A to K starting at row 2
 
 const secretClient = new SecretManagerServiceClient();
 
@@ -84,10 +84,15 @@ functions.http('getShipmentCodes', async (req, res) => {
     console.log('Sheets response received:', response.data);
 
     const rows = response.data.values || [];
-    const shipmentCodes = rows.map(row => row[0]);
-    console.log('Shipment codes fetched:', shipmentCodes);
+    const shipments = rows.map(row => ({
+      shipmentCode: row[0],  // Column A
+      target: row[6],        // Column G
+      firstId: row[9],       // Column J
+      secondId: row[10]      // Column K
+    }));
+    console.log('Shipments fetched:', shipments);
 
-    return res.status(200).send({ shipmentCodes });
+    return res.status(200).send({ shipments });
   } catch (error) {
     console.error('Detailed Error:', error.message, error.stack);
     return res.status(500).send({
