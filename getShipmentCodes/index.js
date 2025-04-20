@@ -4,8 +4,8 @@ const { SecretManagerServiceClient } = require('@google-cloud/secret-manager');
 const jwt = require('jsonwebtoken');
 const sheets = google.sheets('v4');
 
-const SPREADSHEET_ID = '11coHdDHo0ZXYFVVNTBXUfklxXDFh3dACDhyv_L3shgQ';
-const RANGE = 'Data!A2:K'; // Fetch columns A to K starting at row 2
+const SPREADSHEET_ID = '175En4kZ7OoR52jmg_AABZB0h7ag7n48kS-dkxuMCWxo';
+const RANGE = 'Active!A2:K'; // Fetch columns A to K starting at row 2
 
 const secretClient = new SecretManagerServiceClient();
 
