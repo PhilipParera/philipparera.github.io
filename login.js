@@ -23,9 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
         body: JSON.stringify({ bidderId, verificationNumber }),
       });
 
-      console.log('Response status:', response.status);
       const data = await response.json();
-      console.log('Response data:', data);
 
       if (response.ok && data.message === 'Authentication successful') {
         localStorage.setItem('jwtToken', data.token);
@@ -38,7 +36,6 @@ document.addEventListener('DOMContentLoaded', () => {
         displayMessage(data.message || 'Authentication failed');
       }
     } catch (error) {
-      console.error('Error:', error);
       displayMessage('An error occurred. Please try again later.');
     }
   }
