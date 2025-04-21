@@ -41,12 +41,20 @@ document.addEventListener('DOMContentLoaded', () => {
           <td rowspan="3"><input type="number" class="bid-input" data-shipment-code="${shipment.shipmentCode}" placeholder="Enter your bid"></td>
           <td>${target}</td>
           <td rowspan="3">Open: ${shipment.openingDate}<br>Close: ${shipment.closingDate}</td>
+          <td rowspan="3">${shipment.vendorDivision || 'N/A'}</td>
+          <td>${shipment.freightMethod || 'N/A'}</td>
           <td rowspan="3">${shipment.shipmentCode}</td>
         `;
         const row2 = document.createElement('tr');
-        row2.innerHTML = `<td>${firstId}</td>`;
+        row2.innerHTML = `
+          <td>${firstId}</td>
+          <td>${shipment.incoterm || 'N/A'}</td>
+        `;
         const row3 = document.createElement('tr');
-        row3.innerHTML = `<td>${secondId}</td>`;
+        row3.innerHTML = `
+          <td>${secondId}</td>
+          <td>${shipment.pol || 'N/A'}</td>
+        `;
         tbody.appendChild(row1);
         tbody.appendChild(row2);
         tbody.appendChild(row3);

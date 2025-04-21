@@ -90,7 +90,11 @@ functions.http('getShipmentCodes', async (req, res) => {
       closingDate: row[2],   // Column C
       target: row[6],        // Column G
       firstId: row[9],       // Column J
-      secondId: row[10]      // Column K
+      secondId: row[10],      // Column K
+      vendorDivision: row[15], // Column P
+      freightMethod: row[16],  // Column Q
+      incoterm: row[17],       // Column R
+      pol: row[18]             // Column S
     }));
     console.log('Shipments fetched:', shipments);
 
