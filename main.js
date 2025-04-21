@@ -36,13 +36,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const target = shipment.target || 'N/A';
         const firstId = maskId(shipment.firstId);
         const secondId = maskId(shipment.secondId);
-        const formattedOpeningDate = formatDate(shipment.openingDate);
-        const formattedClosingDate = formatDate(shipment.closingDate);
         const row1 = document.createElement('tr');
         row1.innerHTML = `
           <td rowspan="3"><input type="number" class="bid-input" data-shipment-code="${shipment.shipmentCode}" placeholder="Enter your bid"></td>
           <td>${target}</td>
-          <td rowspan="3">Open: ${formattedOpeningDate}<br>Close: ${formattedClosingDate}</td>
+          <td rowspan="3">Open: ${shipment.openingDate}<br>Close: ${shipment.closingDate}</td>
           <td rowspan="3">${shipment.shipmentCode}</td>
         `;
         const row2 = document.createElement('tr');
@@ -81,16 +79,6 @@ document.addEventListener('DOMContentLoaded', () => {
       return id.slice(0, 4) + '****' + id.slice(8);
     }
     return id || 'N/A';
-  }
-
-  function formatDate(dateString) {
-    if (!dateString) return 'N/A';
-    // Extract the date part by removing the time component
-    const dateOnly = dateString.split(' ').slice(0, 3).join(' ');
-    const date = new Date(dateOnly);
-    if (isNaN(date)) return 'Invalid Date';
-    const options = { month: 'short', day: 'numeric', year: 'numeric' };
-    return date.toLocaleDateString('en-US', options);
   }
 
   function submitBid(shipmentCode, bidValue, input) {
