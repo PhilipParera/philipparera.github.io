@@ -43,17 +43,21 @@ document.addEventListener('DOMContentLoaded', () => {
           <td rowspan="3">Open: ${shipment.openingDate}<br>Close: ${shipment.closingDate}</td>
           <td rowspan="3">${shipment.vendorDivision || 'N/A'}</td>
           <td>${shipment.freightMethod || 'N/A'}</td>
+          <td>${shipment.gwKg || 'N/A'}</td>
+          <td rowspan="3" class="wrapped-text">${shipment.shipperAddress || 'N/A'}</td>
           <td rowspan="3">${shipment.shipmentCode}</td>
         `;
         const row2 = document.createElement('tr');
         row2.innerHTML = `
           <td>${firstId}</td>
           <td>${shipment.incoterm || 'N/A'}</td>
+          <td>${shipment.volCbm || 'N/A'}</td>
         `;
         const row3 = document.createElement('tr');
         row3.innerHTML = `
           <td>${secondId}</td>
           <td>${shipment.pol || 'N/A'}</td>
+          <td></td> <!-- Empty cell for alignment -->
         `;
         tbody.appendChild(row1);
         tbody.appendChild(row2);

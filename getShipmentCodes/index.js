@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 const sheets = google.sheets('v4');
 
 const SPREADSHEET_ID = '175En4kZ7OoR52jmg_AABZB0h7ag7n48kS-dkxuMCWxo';
-const RANGE = 'Active!A2:S'; // Fetch columns A to S starting at row 2
+const RANGE = 'Active!A2:V'; // Fetch columns A to V starting at row 2
 
 const secretClient = new SecretManagerServiceClient();
 
@@ -85,16 +85,19 @@ functions.http('getShipmentCodes', async (req, res) => {
 
     const rows = response.data.values || [];
     const shipments = rows.map(row => ({
-      shipmentCode: row[0],  // Column A
-      openingDate: row[1],   // Column B
-      closingDate: row[2],   // Column C
-      target: row[6],        // Column G
-      firstId: row[9],       // Column J
-      secondId: row[10],      // Column K
+      shipmentCode: row[0],    // Column A
+      openingDate: row[1],     // Column B
+      closingDate: row[2],     // Column C
+      target: row[6],          // Column G
+      firstId: row[9],         // Column J
+      secondId: row[10],       // Column K
       vendorDivision: row[15], // Column P
       freightMethod: row[16],  // Column Q
       incoterm: row[17],       // Column R
-      pol: row[18]             // Column S
+      pol: row[18],            // Column S
+      gwKg: row[19],           // Column T
+      volCbm: row[20],         // Column U
+      shipperAddress: row[21]  // Column V
     }));
     console.log('Shipments fetched:', shipments);
 
