@@ -86,6 +86,8 @@ functions.http('getShipmentCodes', async (req, res) => {
     const rows = response.data.values || [];
     const shipments = rows.map(row => ({
       shipmentCode: row[0],  // Column A
+      openingDate: row[1],   // Column B
+      closingDate: row[2],   // Column C
       target: row[6],        // Column G
       firstId: row[9],       // Column J
       secondId: row[10]      // Column K

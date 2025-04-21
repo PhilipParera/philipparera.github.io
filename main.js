@@ -40,6 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
         row1.innerHTML = `
           <td rowspan="3"><input type="number" class="bid-input" data-shipment-code="${shipment.shipmentCode}" placeholder="Enter your bid"></td>
           <td>${target}</td>
+          <td rowspan="3">Open: ${shipment.openingDate}<br>Close: ${shipment.closingDate}</td>
           <td rowspan="3">${shipment.shipmentCode}</td>
         `;
         const row2 = document.createElement('tr');
