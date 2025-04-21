@@ -85,8 +85,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function formatDate(dateString) {
     if (!dateString) return 'N/A';
-    const [month, day, year] = dateString.split('/');
-    const date = new Date(year, month - 1, day);
+    // Extract the date part by removing the time component
+    const dateOnly = dateString.split(' ').slice(0, 3).join(' ');
+    const date = new Date(dateOnly);
+    if (isNaN(date)) return 'Invalid Date';
     const options = { month: 'short', day: 'numeric', year: 'numeric' };
     return date.toLocaleDateString('en-US', options);
   }
