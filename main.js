@@ -31,58 +31,135 @@ document.addEventListener('DOMContentLoaded', () => {
     })
     .then(data => {
       const shipments = data.shipments;
-      const tbody = document.querySelector('#bid-table tbody');
+
+      // Process shipments to extract freightMethodOnly and pod
       shipments.forEach(shipment => {
-        const target = shipment.target || 'N/A';
-        const firstId = maskId(shipment.firstId);
-        const secondId = maskId(shipment.secondId);
-        const row1 = document.createElement('tr');
-        row1.innerHTML = `
-          <td rowspan="3"><input type="number" class="bid-input" data-shipment-code="${shipment.shipmentCode}" placeholder="Enter your bid"></td>
-          <td>${target}</td>
-          <td rowspan="3">Open: ${shipment.openingDate}<br>Close: ${shipment.closingDate}</td>
-          <td rowspan="3">${shipment.vendorDivision || 'N/A'}</td>
-          <td>${shipment.freightMethod || 'N/A'}</td>
-          <td>${shipment.gwKg || 'N/A'}</td>
-          <td rowspan="3" class="wrapped-text">${shipment.shipperAddress || 'N/A'}</td>
-          <td rowspan="3">${shipment.shipmentCode}</td>
-        `;
-        const row2 = document.createElement('tr');
-        row2.innerHTML = `
-          <td>${firstId}</td>
-          <td>${shipment.incoterm || 'N/A'}</td>
-          <td>${shipment.volCbm || 'N/A'}</td>
-        `;
-        const row3 = document.createElement('tr');
-        row3.innerHTML = `
-          <td>${secondId}</td>
-          <td>${shipment.pol || 'N/A'}</td>
-          <td></td> <!-- Empty cell for alignment -->
-        `;
-        tbody.appendChild(row1);
-        tbody.appendChild(row2);
-        tbody.appendChild(row3);
+        if (shipment.freightMethod) {
+          const parts = shipment.freightMethod.split(' - ');
+          const methodFull = parts[0] || 'N/A';
+          shipment.freightMethodOnly = methodFull.substring(0, 3);
+          shipment.pod = parts[1] || 'N/A';
+        } else {
+          shipment.freightMethodOnly = 'N/A';
+          shipment.pod = 'N/A';
+        }
       });
-      // Add event listeners to bid inputs
-      const bidInputs = document.querySelectorAll('.bid-input');
-      bidInputs.forEach(input => {
-        input.addEventListener('keypress', (event) => {
-          if (event.key === 'Enter') {
-            event.preventDefault();
-            const shipmentCode = input.getAttribute('data-shipment-code');
-            const bidValue = input.value;
-            if (bidValue) {
-              submitBid(shipmentCode, bidValue, input);
-            } else {
-              alert('Please enter a bid value.');
-            }
-          }
-        });
+
+      // Get unique values for filters
+      const uniqueVendors = [...new Set(shipments.map(s => s.vendorDivision || 'N/A'))].sort();
+      const uniqueMethods = [...new Set(shipments.map(s => s.freightMethodOnly))].sort();
+      const uniquePods = [...new Set(shipments.map(s => s.pod))].sort();
+
+      // Populate drop-downs
+      const vendorSelect = document.getElementById('vendor-filter');
+      uniqueVendors.forEach(vendor => {
+        const option = document.createElement('option');
+        option.value = vendor;
+        option.textContent = vendor;
+        vendorSelect.appendChild(option);
       });
+
+      const methodSelect = document.getElementById('method-filter');
+      uniqueMethods.forEach(method => {
+        const option = document.createElement('option');
+        option.value = method;
+        option.textContent = method;
+        methodSelect.appendChild(option);
+      });
+
+      const podSelect = document.getElementById('pod-filter');
+      uniquePods.forEach(pod => {
+        const option = document.createElement('option');
+        option.value = pod;
+        option.textContent = pod;
+        podSelect.appendChild(option);
+      });
+
+      // Add event listeners to filters
+      vendorSelect.addEventListener('change', () => updateTable(shipments));
+      methodSelect.addEventListener('change', () => updateTable(shipments));
+      podSelect.addEventListener('change', () => updateTable(shipments));
+
+      // Initial table rendering
+      updateTable(shipments);
     })
     .catch(error => {
       console.error('Error fetching shipments:', error);
       alert('Failed to load shipments. Please try again later.');
+    });
+  }
+
+  function updateTable(shipments) {
+    const vendorSelect = document.getElementById('vendor-filter');
+    const methodSelect = document.getElementById('method-filter');
+    const podSelect = document.getElementById('pod-filter');
+
+    const selectedVendor = vendorSelect.value;
+    const selectedMethod = methodSelect.value;
+    const selectedPod = podSelect.value;
+
+    // Filter shipments based on selected values
+    const filteredShipments = shipments.filter(shipment => {
+      return (selectedVendor === '' || shipment.vendorDivision === selectedVendor) &&
+             (selectedMethod === '' || shipment.freightMethodOnly === selectedMethod) &&
+             (selectedPod === '' || shipment.pod === selectedPod);
+    });
+
+    // Update table
+    const tbody = document.querySelector('#bid-table tbody');
+    tbody.innerHTML = '';
+
+    filteredShipments.forEach(shipment => {
+      const target = shipment.target || 'N/A';
+      const firstId = maskId(shipment.firstId);
+      const secondId = maskId(shipment.secondId);
+
+      const row1 = document.createElement('tr');
+      row1.innerHTML = `
+        <td rowspan="3"><input type="number" class="bid-input" data-shipment-code="${shipment.shipmentCode}" placeholder="Enter your bid"></td>
+        <td>${target}</td>
+        <td rowspan="3">Open: ${shipment.openingDate}<br>Close: ${shipment.closingDate}</td>
+        <td rowspan="3">${shipment.vendorDivision || 'N/A'}</td>
+        <td>${shipment.freightMethod || 'N/A'}</td>
+        <td>${shipment.gwKg || 'N/A'}</td>
+        <td rowspan="3" class="wrapped-text">${shipment.shipperAddress || 'N/A'}</td>
+        <td rowspan="3">${shipment.shipmentCode}</td>
+      `;
+
+      const row2 = document.createElement('tr');
+      row2.innerHTML = `
+        <td>${firstId}</td>
+        <td>${shipment.incoterm || 'N/A'}</td>
+        <td>${shipment.volCbm || 'N/A'}</td>
+      `;
+
+      const row3 = document.createElement('tr');
+      row3.innerHTML = `
+        <td>${secondId}</td>
+        <td>${shipment.pol || 'N/A'}</td>
+        <td></td> <!-- Empty cell for alignment -->
+      `;
+
+      tbody.appendChild(row1);
+      tbody.appendChild(row2);
+      tbody.appendChild(row3);
+    });
+
+    // Re-attach event listeners to bid inputs
+    const bidInputs = document.querySelectorAll('.bid-input');
+    bidInputs.forEach(input => {
+      input.addEventListener('keypress', (event) => {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          const shipmentCode = input.getAttribute('data-shipment-code');
+          const bidValue = input.value;
+          if (bidValue) {
+            submitBid(shipmentCode, bidValue, input);
+          } else {
+            alert('Please enter a bid value.');
+          }
+        }
+      });
     });
   }
 
