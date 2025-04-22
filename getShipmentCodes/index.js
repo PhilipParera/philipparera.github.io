@@ -27,7 +27,8 @@ async function getKey() {
 async function getJwtSecret() {
   try {
     const [version] = await secretClient.accessSecretVersion({
-      name: 'projects/key-line-454113-g0/secrets/jwt-secret/Yam
+      name: 'projects/key-line-454113-g0/secrets/jwt-secret/versions/latest',
+    });
     return version.payload.data.toString();
   } catch (error) {
     console.error('Error fetching JWT secret:', error.message);
@@ -50,7 +51,11 @@ functions.http('getShipmentCodes', async (req, res) => {
   if (!authHeader) {
     return res.status(401).send({ error: 'No authorization token provided' });
   }
-  const token = authHeader.split(' ')[1];
+  const authParts = authHeader.split(' ');
+  if (authParts.length !== 2 || authParts[0] !== 'Bearer') {
+    return res.status(401).send({ error: 'Invalid authorization header' });
+  }
+  const token = authParts[1];
   try {
     const jwtSecret = await getJwtSecret();
     jwt.verify(token, jwtSecret);
@@ -73,7 +78,6 @@ functions.http('getShipmentCodes', async (req, res) => {
     const client = await auth.getClient();
     console.log('Auth client obtained.');
 
-    // Use query parameter to determine sheet, default to 'Active'
     const sheetName = req.query.sheet || 'Active';
     if (!['Active', 'Closed'].includes(sheetName)) {
       return res.status(400).send({ error: 'Invalid sheet name' });
@@ -90,19 +94,19 @@ functions.http('getShipmentCodes', async (req, res) => {
 
     const rows = response.data.values || [];
     const shipments = rows.map(row => ({
-      shipmentCode: row[0],    // Column A
-      openingDate: row[1],     // Column B
-      closingDate: row[2],     // Column C
-      target: row[6],          // Column G
-      firstId: row[9],         // Column J
-      secondId: row[10],       // Column K
-      vendorDivision: row[15], // Column P
-      freightMethod: row[16],  // Column Q
-      incoterm: row[17],       // Column R
-      pol: row[18],            // Column S
-      gwKg: row[19],           // Column T
-      volCbm: row[20],         // Column U
-      shipperAddress: row[21]  // Column V
+      shipmentCode: row[0] || '',
+      openingDate: row[1] || '',
+      closingDate: row[2] || '',
+      target: row[6] || '',
+      firstId: row[9] || '',
+      secondId: row[10] || '',
+      vendorDivision: row[15] || '',
+      freightMethod: row[16] || '',
+      incoterm: row[17] || '',
+      pol: row[18] || '',
+      gwKg: row[19] || '',
+      volCbm: row[20] || '',
+      shipperAddress: row[21] || ''
     }));
     console.log('Shipments fetched:', shipments);
 
