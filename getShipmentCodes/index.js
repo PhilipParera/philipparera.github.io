@@ -5,7 +5,6 @@ const jwt = require('jsonwebtoken');
 const sheets = google.sheets('v4');
 
 const SPREADSHEET_ID = '175En4kZ7OoR52jmg_AABZB0h7ag7n48kS-dkxuMCWxo';
-const RANGE = 'Active!A2:V'; // Fetch columns A to V starting at row 2
 
 const secretClient = new SecretManagerServiceClient();
 
@@ -28,8 +27,7 @@ async function getKey() {
 async function getJwtSecret() {
   try {
     const [version] = await secretClient.accessSecretVersion({
-      name: 'projects/key-line-454113-g0/secrets/jwt-secret/versions/latest',
-    });
+      name: 'projects/key-line-454113-g0/secrets/jwt-secret/Yam
     return version.payload.data.toString();
   } catch (error) {
     console.error('Error fetching JWT secret:', error.message);
@@ -39,7 +37,7 @@ async function getJwtSecret() {
 
 functions.http('getShipmentCodes', async (req, res) => {
   console.log('Request received:', req.method);
-  res.set('Access-Control-Allow-Origin', 'https://www.freight-ebidding.com');
+  res.set('Access-Control-Allow-Origin', '*'); // Changed for local testing
   res.set('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
@@ -74,6 +72,13 @@ functions.http('getShipmentCodes', async (req, res) => {
 
     const client = await auth.getClient();
     console.log('Auth client obtained.');
+
+    // Use query parameter to determine sheet, default to 'Active'
+    const sheetName = req.query.sheet || 'Active';
+    if (!['Active', 'Closed'].includes(sheetName)) {
+      return res.status(400).send({ error: 'Invalid sheet name' });
+    }
+    const RANGE = `${sheetName}!A2:V`;
 
     console.log('Querying Google Sheets...');
     const response = await sheets.spreadsheets.values.get({
