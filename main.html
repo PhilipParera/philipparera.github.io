@@ -3,82 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Main Page</title>
+    <title>Freight E-Bidding</title>
     <style>
-        body {
-            font-family: Calibri, sans-serif;
-            margin: 0;
-            padding: 20px;
-        }
-        .bidder-id {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            font-weight: bold;
-            background: #f0f0f0;
-            padding: 5px 10px;
-            border: 1px solid #ccc;
-            border-radius: 3px;
-        }
-        .content {
-            margin-top: 50px;
-            text-align: center;
-        }
-        .content h1 {
-            font-size: 1.2em;
-            text-align: left;
-            margin-bottom: 10px;
-        }
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
         }
         th, td {
-            padding: 10px;
-            border: 1px solid #ccc;
-            text-align: center;
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
         }
         th {
-            background-color: #f0f0f0;
-            position: sticky;
-            top: 0;
-            z-index: 1;
+            background-color: #f2f2f2;
         }
         .bid-input {
-            width: 150px;
-            padding: 5px;
-            font-size: 16px;
+            width: 100px;
         }
         .wrapped-text {
-            white-space: normal;
+            max-width: 200px;
             word-wrap: break-word;
+        }
+        .filters {
+            margin-bottom: 20px;
+        }
+        .filters label {
+            margin-right: 10px;
+        }
+        .filters select {
+            padding: 5px;
+            margin-right: 20px;
+            width: 200px; /* Medium box size */
         }
     </style>
 </head>
 <body>
-    <div class="bidder-id" id="bidder-id-display"></div>
     <div class="content">
         <h1>Welcome, <span id="user-name"></span></h1>
+        <div class="filters">
+            <label for="vendor-division-filter">Vendor - Division:</label>
+            <select id="vendor-division-filter">
+                <option value="all">All</option>
+            </select>
+            <label for="freight-method-filter">Freight Method:</label>
+            <select id="freight-method-filter">
+                <option value="all">All</option>
+            </select>
+            <label for="pod-filter">POD:</label>
+            <select id="pod-filter">
+                <option value="all">All</option>
+            </select>
+        </div>
         <table id="bid-table">
             <thead>
                 <tr>
-                    <th>Bid Value (IDR)</th>
-                    <th>Target (IDR) /<br>Potential Winner / Runner Up</th>
-                    <th>Open & Closing Date</th>
+                    <th>Bid</th>
+                    <th>Target</th>
+                    <th>Dates</th>
                     <th>Vendor - Division</th>
-                    <th>Freight Method - POD /<br>Incoterm / POL</th>
-                    <th>Cargo detail<br>GW (Kg) & Vol. (Cbm)</th>
-                    <th>Shipper's Address</th>
+                    <th>Freight Method - POD / ...</th>
+                    <th>GW (kg) / Vol (cbm)</th>
+                    <th>Shipper Address</th>
                     <th>Shipment Code</th>
                 </tr>
             </thead>
-            <tbody>
-                <!-- Rows will be dynamically inserted here -->
-            </tbody>
+            <tbody></tbody>
         </table>
     </div>
     <script src="main.js"></script>
-    <!-- Existing Cloudflare scripts remain unchanged -->
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'93317edaba606776',t:'MTc0NTExOTExOC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'933dbe4bef9d451d',t:'MTc0NTI0NzU0Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'933e73886a3f070b',t:'MTc0NTI1NDk2OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'933eb243dbdabce0',t:'MTc0NTI1NzUzOS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'933ed167ea7e32e0',t:'MTc0NTI1ODgxNC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>
