@@ -57,23 +57,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Process shipments: trim data and parse closing date
     shipmentsData.forEach(shipment => {
-      shipment.shipmentCode = shipment.shipmentCode.trim();
-      shipment.firstId = shipment.firstId.trim();
-      if (shipment.freightMethod) {
-        const parts = shipment.freightMethod.split(' - ');
-        shipment.freightMethodOnly = parts[0] ? parts[0].substring(0, 3) : 'N/A';
-        shipment.pod = parts[1] || 'N/A';
-      } else {
-        shipment.freightMethodOnly = 'N/A';
-        shipment.pod = 'N/A';
-      }
       if (shipment.closingDate) {
-        const datePart = shipment.closingDate.split(' ')[0]; // Extract "MMM/DD/YYYY"
-        shipment.closingDateObj = parseDate(datePart);
+          const parts = shipment.closingDate.split(' ');
+          if (parts.length >= 3) {
+              const month = parts[0].replace(/\.$/, ''); // "Apr." → "Apr"
+              const day = parts[1].replace(/,$/, '');    // "24," → "24"
+              const year = parts[2];                     // "2025"
+              const dateStr = `${month}/${day}/${year}`; // "Apr/24/2025"
+              shipment.closingDateObj = parseDate(dateStr);
+          } else {
+              shipment.closingDateObj = null;
+          }
       } else {
-        shipment.closingDateObj = null;
+          shipment.closingDateObj = null;
       }
-    });
+  });
 
     console.log('Closed shipments:', shipmentsData);
 
