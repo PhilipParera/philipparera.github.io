@@ -31,14 +31,23 @@ functions.http('getBidData', async (req, res) => {
       const client = await auth.getClient();
       const sheets = google.sheets({ version: 'v4', auth: client });
 
-      // Assuming bids are in a "Bids" sheet, columns: bidderId, jobCode, bidValue
-      const response = await sheets.spreadsheets.values.get({
+      // Fetch from IDJIRST_Flow
+      const response1 = await sheets.spreadsheets.values.get({
         spreadsheetId: SPREADSHEET_ID,
-        range: 'Bids!A2:C', // Adjust range based on your sheet
+        range: 'IDJIRST_Flow!B2:D',
       });
 
-      const rows = response.data.values || [];
-      const bids = rows.map(row => ({
+      // Fetch from IDPIPCI_Flow
+      const response2 = await sheets.spreadsheets.values.get({
+        spreadsheetId: SPREADSHEET_ID,
+        range: 'IDPIPCI_Flow!B2:D',
+      });
+
+      const rows1 = response1.data.values || [];
+      const rows2 = response2.data.values || [];
+      const allRows = [...rows1, ...rows2];
+
+      const bids = allRows.map(row => ({
         bidderId: row[0] || '',
         jobCode: row[1] || '',
         bidValue: parseFloat(row[2]) || 0
