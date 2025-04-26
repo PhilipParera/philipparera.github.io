@@ -85,15 +85,35 @@ document.addEventListener('DOMContentLoaded', () => {
     methodSelect.addEventListener('change', () => updateTable(shipments));
     podSelect.addEventListener('change', () => updateTable(shipments));
 
-    // Initial table rendering
-    updateTable(shipments);
+    // Fetch bid data
+    fetch('https://us-central1-key-line-454113-g0.cloudfunctions.net/getBidData', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Failed to fetch bid data');
+      }
+      return response.json();
+    })
+    .then(bidData => {
+      const allBids = bidData.bids;
+      // Initial table rendering with bid data
+      updateTable(shipments, allBids);
+    })
+    .catch(error => {
+      console.error('Error fetching bid data:', error);
+      alert('Failed to load bid data. Please try again later.');
+    });
   })
   .catch(error => {
     console.error('Error fetching closed shipments:', error);
     alert('Failed to load closed shipments. Please try again later.');
   });
 
-  function updateTable(shipments) {
+  function updateTable(shipments, allBids = []) {
     const winnerSelect = document.getElementById('winner-filter');
     const vendorSelect = document.getElementById('vendor-filter');
     const methodSelect = document.getElementById('method-filter');
@@ -114,60 +134,37 @@ document.addEventListener('DOMContentLoaded', () => {
     const tbody = document.querySelector('#closed-bid-table tbody');
     tbody.innerHTML = '';
 
-    const promises = filteredShipments.map(shipment => {
+    filteredShipments.forEach(shipment => {
       const winner = maskId(shipment.firstId);
       const jobCode = shipment.shipmentCode;
-      return calculateSpread(bidderId, jobCode, shipment.firstId, shipment.winningBid).then(spread => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td>${shipment.closingDate || 'N/A'}</td>
-          <td>${winner}</td>
-          <td>${spread}</td>
-          <td>${shipment.vendorDivision || 'N/A'}</td>
-          <td>${shipment.freightMethod || 'N/A'}</td>
-          <td>${shipment.incoterm || 'N/A'}</td>
-          <td>${shipment.pol || 'N/A'}</td>
-          <td>${shipment.gwKg || 'N/A'}</td>
-          <td>${shipment.volCbm || 'N/A'}</td>
-          <td class="wrapped-text">${shipment.shipperAddress || 'N/A'}</td>
-          <td>${jobCode}</td>
-        `;
-        tbody.appendChild(row);
-      });
-    });
-
-    Promise.all(promises).catch(error => {
-      console.error('Error rendering table:', error);
+      const spread = calculateSpread(bidderId, jobCode, shipment.firstId, allBids);
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${shipment.closingDate || 'N/A'}</td>
+        <td>${winner}</td>
+        <td>${spread}</td>
+        <td>${shipment.vendorDivision || 'N/A'}</td>
+        <td>${shipment.freightMethod || 'N/A'}</td>
+        <td>${shipment.incoterm || 'N/A'}</td>
+        <td>${shipment.pol || 'N/A'}</td>
+        <td>${shipment.gwKg || 'N/A'}</td>
+        <td>${shipment.volCbm || 'N/A'}</td>
+        <td class="wrapped-text">${shipment.shipperAddress || 'N/A'}</td>
+        <td>${jobCode}</td>
+      `;
+      tbody.appendChild(row);
     });
   }
 
-  async function calculateSpread(bidderId, jobCode, winnerId, winningBid) {
+  function calculateSpread(bidderId, jobCode, winnerId, allBids) {
     try {
-      const sheetId = '175En4kZ7OoR52jmg_AABZB0h7ag7n48kS-dkxuMCWxo';
-      const apiKey = 'YOUR_API_KEY'; // Replace with your Google Sheets API key
-      const sheets = ['IDJIRST_Flow', 'IDPIPCI_Flow'];
-      let allBids = [];
-
-      for (const sheet of sheets) {
-        const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${sheet}!B2:D?key=${apiKey}`;
-        const response = await fetch(url);
-        if (!response.ok) throw new Error(`Failed to fetch ${sheet}`);
-        const data = await response.json();
-        const bids = (data.values || []).map(row => ({
-          bidderId: row[0],
-          jobCode: row[1],
-          bidValue: parseFloat(row[2])
-        }));
-        allBids = allBids.concat(bids);
-      }
-
       const bidderBids = allBids.filter(bid => bid.bidderId === bidderId && bid.jobCode === jobCode);
       if (bidderBids.length === 0) return 'No Bid';
 
       if (bidderId === winnerId) return 'Won';
 
       const bidderLowestBid = Math.min(...bidderBids.map(bid => bid.bidValue));
-      const winningBidValue = parseFloat(winningBid) || Math.min(...allBids.filter(bid => bid.jobCode === jobCode).map(bid => bid.bidValue));
+      const winningBidValue = Math.min(...allBids.filter(bid => bid.jobCode === jobCode && bid.bidderId === winnerId).map(bid => bid.bidValue));
 
       if (bidderLowestBid === winningBidValue) return '-';
 
