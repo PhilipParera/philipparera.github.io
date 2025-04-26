@@ -40,16 +40,24 @@
             border-collapse: collapse;
             margin-top: 20px;
         }
-        th, td {
-            padding: 10px;
-            border: 1px solid #ccc;
-            text-align: center;
-        }
         th {
-            background-color: #f0f0f0;
+            background-color: #000080; /* Dark blue */
+            color: white;
             position: sticky;
             top: 0;
             z-index: 1;
+            padding: 5px; /* Slimmer rows */
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2; /* Soft grey */
+        }
+        tr:nth-child(odd) {
+            background-color: white;
+        }
+        td {
+            padding: 5px; /* Slimmer rows */
+            border: 1px solid #ccc;
+            text-align: center;
         }
         .wrapped-text {
             white-space: normal;
