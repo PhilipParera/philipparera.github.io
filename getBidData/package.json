@@ -2,14 +2,10 @@
   "name": "getbiddata",
   "version": "1.0.0",
   "main": "getBidData.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
   "dependencies": {
-    "@google-cloud/functions-framework": "^3.5.1"
+    "@google-cloud/functions-framework": "^3.0.0"
+  },
+  "engines": {
+    "node": "20"
   }
 }
