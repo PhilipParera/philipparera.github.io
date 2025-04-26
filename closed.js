@@ -26,18 +26,18 @@ document.addEventListener('DOMContentLoaded', () => {
   // Function to parse date from "MMM/DD/YYYY" format
   function parseDate(dateStr) {
     const months = {
-        'Jan': 0, 'Feb': 1, 'Mar': 2, 'Apr': 3, 'May': 4, 'Jun': 5,
-        'Jul': 6, 'Aug': 7, 'Sep': 8, 'Oct': 9, 'Nov': 10, 'Dec': 11
+      'Jan': 0, 'Feb': 1, 'Mar': 2, 'Apr': 3, 'May': 4, 'Jun': 5,
+      'Jul': 6, 'Aug': 7, 'Sep': 8, 'Oct': 9, 'Nov': 10, 'Dec': 11
     };
     const [monthAbbr, day, year] = dateStr.split('/');
     const cleanedMonthAbbr = monthAbbr.replace(/\.$/, ''); // Remove trailing period
     const month = months[cleanedMonthAbbr];
     if (month === undefined) {
-        console.error(`Invalid month abbreviation: ${cleanedMonthAbbr}`);
-        return null;
+      console.error(`Invalid month abbreviation: ${cleanedMonthAbbr}`);
+      return null;
     }
     return new Date(year, month, day);
-}
+  }
 
   // Fetch closed shipments
   fetch('https://us-central1-key-line-454113-g0.cloudfunctions.net/getShipmentCodes?sheet=Closed', {
@@ -55,32 +55,53 @@ document.addEventListener('DOMContentLoaded', () => {
   .then(data => {
     shipmentsData = data.shipments;
 
-    // Process shipments: trim data and parse closing date
+    // Process shipments: trim data, parse freight method, and handle closing date
     shipmentsData.forEach(shipment => {
-      if (shipment.closingDate) {
-          const parts = shipment.closingDate.split(' ');
-          if (parts.length >= 3) {
-              const month = parts[0].replace(/\.$/, ''); // "Apr." → "Apr"
-              const day = parts[1].replace(/,$/, '');    // "24," → "24"
-              const year = parts[2];                     // "2025"
-              const dateStr = `${month}/${day}/${year}`; // "Apr/24/2025"
-              shipment.closingDateObj = parseDate(dateStr);
-          } else {
-              shipment.closingDateObj = null;
-          }
+      shipment.shipmentCode = shipment.shipmentCode.trim();
+      shipment.firstId = shipment.firstId.trim();
+      if (shipment.freightMethod) {
+        const parts = shipment.freightMethod.split(' - ');
+        shipment.freightMethodOnly = parts[0] ? parts[0].substring(0, 3) : 'N/A';
+        shipment.pod = parts[1] || 'N/A';
       } else {
-          shipment.closingDateObj = null;
+        shipment.freightMethodOnly = 'N/A';
+        shipment.pod = 'N/A';
       }
-  });
+      if (shipment.closingDate) {
+        const parts = shipment.closingDate.split(' ');
+        if (parts.length >= 3) {
+          const month = parts[0].replace(/\.$/, ''); // "Apr." → "Apr"
+          const day = parts[1].replace(/,$/, '');    // "24," → "24"
+          const year = parts[2];                     // "2025"
+          const dateStr = `${month}/${day}/${year}`; // "Apr/24/2025"
+          shipment.closingDateObj = parseDate(dateStr);
+          if (shipment.closingDateObj) {
+            const yearNum = shipment.closingDateObj.getFullYear();
+            const monthNum = String(shipment.closingDateObj.getMonth() + 1).padStart(2, '0');
+            const dayNum = String(shipment.closingDateObj.getDate()).padStart(2, '0');
+            shipment.closingDateStr = `${yearNum}-${monthNum}-${dayNum}`;
+          } else {
+            shipment.closingDateStr = null;
+          }
+        } else {
+          shipment.closingDateObj = null;
+          shipment.closingDateStr = null;
+        }
+      } else {
+        shipment.closingDateObj = null;
+        shipment.closingDateStr = null;
+      }
+    });
 
     console.log('Closed shipments:', shipmentsData);
 
-    // Populate filters with unique values
+    // Get unique values for filters
     const uniqueWinners = [...new Set(shipmentsData.map(s => s.firstId || 'N/A'))].sort();
     const uniqueVendors = [...new Set(shipmentsData.map(s => s.vendorDivision || 'N/A'))].sort();
     const uniqueMethods = [...new Set(shipmentsData.map(s => s.freightMethodOnly))].sort();
     const uniquePods = [...new Set(shipmentsData.map(s => s.pod))].sort();
 
+    // Populate drop-downs
     const winnerSelect = document.getElementById('winner-filter');
     uniqueWinners.forEach(winner => {
       const option = document.createElement('option');
@@ -113,7 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
       podSelect.appendChild(option);
     });
 
-    // Add event listeners to all filters
+    // Add event listeners to filters
     winnerSelect.addEventListener('change', updateTable);
     vendorSelect.addEventListener('change', updateTable);
     methodSelect.addEventListener('change', updateTable);
@@ -169,17 +190,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const startDateStr = startDateInput.value;
     const endDateStr = endDateInput.value;
 
-    let startDate, endDate;
-    if (startDateStr) {
-      startDate = new Date(startDateStr);
-    }
-    if (endDateStr) {
-      endDate = new Date(endDateStr);
-    }
-
     const filteredShipments = shipmentsData.filter(shipment => {
-      const dateCondition = (!startDate || (shipment.closingDateObj && shipment.closingDateObj >= startDate)) &&
-                            (!endDate || (shipment.closingDateObj && shipment.closingDateObj <= endDate));
+      const dateCondition = (!startDateStr || (shipment.closingDateStr && shipment.closingDateStr >= startDateStr)) &&
+                            (!endDateStr || (shipment.closingDateStr && shipment.closingDateStr <= endDateStr));
       return (selectedWinner === '' || shipment.firstId === selectedWinner) &&
              (selectedVendor === '' || shipment.vendorDivision === selectedVendor) &&
              (selectedMethod === '' || shipment.freightMethodOnly === selectedMethod) &&
