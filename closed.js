@@ -12,9 +12,12 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('bidder-id-display').textContent = `Bidder ID: ${maskedId}`;
   }
 
-  // Function to normalize job codes
-  function normalizeJobCode(code) {
-    return code.replace(/[-\s]+/g, '_');
+  // Function to mask ID for comparison
+  function maskIdForComparison(id) {
+    if (id && id.length === 12) {
+      return id.slice(0, 4) + '****' + id.slice(8);
+    }
+    return id;
   }
 
   // Fetch closed shipments
@@ -33,9 +36,9 @@ document.addEventListener('DOMContentLoaded', () => {
   .then(data => {
     const shipments = data.shipments;
 
-    // Trim and normalize shipment data
+    // Trim shipment data and process freightMethod
     shipments.forEach(shipment => {
-      shipment.shipmentCode = normalizeJobCode(shipment.shipmentCode.trim());
+      shipment.shipmentCode = shipment.shipmentCode.trim();
       shipment.firstId = shipment.firstId.trim();
       if (shipment.freightMethod) {
         const parts = shipment.freightMethod.split(' - ');
@@ -110,7 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
     .then(bidData => {
       const allBids = bidData.bids.map(bid => ({
         bidderId: bid.bidderId.trim(),
-        jobCode: normalizeJobCode(bid.jobCode.trim()),
+        jobCode: bid.jobCode.trim(),
         bidValue: bid.bidValue
       }));
       console.log('All bids:', allBids);
@@ -171,17 +174,18 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function calculateSpread(bidderId, jobCode, winnerId, allBids) {
-    console.log(`Calculating spread - Bidder: ${bidderId}, Job: ${jobCode}, Winner: ${winnerId}`);
-    console.log(`Bidder ID: ${bidderId}, Winner ID: ${winnerId}, Equal: ${bidderId === winnerId}`);
+    const maskedBidderId = maskIdForComparison(bidderId);
+    console.log(`Calculating spread - Bidder: ${maskedBidderId}, Job: ${jobCode}, Winner: ${winnerId}`);
+    console.log(`Bidder ID: ${maskedBidderId}, Winner ID: ${winnerId}, Equal: ${maskedBidderId === winnerId}`);
     try {
       const bidderBids = allBids.filter(bid => bid.bidderId === bidderId && bid.jobCode === jobCode);
       console.log(`Bidder bids:`, bidderBids);
       if (bidderBids.length === 0) return 'No Bid';
 
-      if (bidderId === winnerId) return 'Won';
+      if (maskedBidderId === winnerId) return 'Won';
 
       const bidderLowestBid = Math.min(...bidderBids.map(bid => bid.bidValue));
-      const winningBids = allBids.filter(bid => bid.jobCode === jobCode && bid.bidderId === winnerId);
+      const winningBids = allBids.filter(bid => maskIdForComparison(bid.bidderId) === winnerId && bid.jobCode === jobCode);
       console.log(`Winning bids:`, winningBids);
       if (winningBids.length === 0) return 'No Winning Bid';
 
