@@ -53,11 +53,12 @@
             z-index: 1;
             padding: 5px; /* Reduced padding for thinner rows */
         }
-        tr:nth-child(even) {
-            background-color: #f2f2f2; /* Soft grey */
-        }
-        tr:nth-child(odd) {
+        /* Apply alternating colors to groups of three rows */
+        tbody tr:nth-child(6n-5), tbody tr:nth-child(6n-4), tbody tr:nth-child(6n-3) {
             background-color: white;
+        }
+        tbody tr:nth-child(6n-2), tbody tr:nth-child(6n-1), tbody tr:nth-child(6n) {
+            background-color: #f2f2f2; /* Soft grey */
         }
         td, th {
             padding: 5px; /* Reduced padding for thinner rows */
@@ -100,13 +101,13 @@
             <thead>
                 <tr>
                     <th>ALL-IN Rate<br>Bid Value (IDR)</th>
-                    <th>Target (IDR) /<br>Potential Winner / Runner Up</th>
+                    <th>Target Rate (IDR) /<br>Potential Winner /<br>Runner Up</th>
                     <th>Opening /<br>Closing Date</th>
                     <th>Vendor - Division</th>
-                    <th>Freight Method - POD /<br>Incoterm / POL</th>
-                    <th>Cargo detail<br>GW (Kg) /<br>Vol. (Cbm)</th>
+                    <th>Freight - POD /<br>Incoterm / POL</th>
+                    <th>GW-CW (Kg) /<br>Vol. (Cbm)</th>
                     <th>Shipper's Address</th>
-                    <th>Shipment Code</th>
+                    <th>Code</th>
                 </tr>
             </thead>
             <tbody>
