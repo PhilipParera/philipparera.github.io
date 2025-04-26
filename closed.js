@@ -26,17 +26,18 @@ document.addEventListener('DOMContentLoaded', () => {
   // Function to parse date from "MMM/DD/YYYY" format
   function parseDate(dateStr) {
     const months = {
-      'Jan': 0, 'Feb': 1, 'Mar': 2, 'Apr': 3, 'May': 4, 'Jun': 5,
-      'Jul': 6, 'Aug': 7, 'Sep': 8, 'Oct': 9, 'Nov': 10, 'Dec': 11
+        'Jan': 0, 'Feb': 1, 'Mar': 2, 'Apr': 3, 'May': 4, 'Jun': 5,
+        'Jul': 6, 'Aug': 7, 'Sep': 8, 'Oct': 9, 'Nov': 10, 'Dec': 11
     };
     const [monthAbbr, day, year] = dateStr.split('/');
-    const month = months[monthAbbr];
+    const cleanedMonthAbbr = monthAbbr.replace(/\.$/, ''); // Remove trailing period
+    const month = months[cleanedMonthAbbr];
     if (month === undefined) {
-      console.error(`Invalid month abbreviation: ${monthAbbr}`);
-      return null;
+        console.error(`Invalid month abbreviation: ${cleanedMonthAbbr}`);
+        return null;
     }
     return new Date(year, month, day);
-  }
+}
 
   // Fetch closed shipments
   fetch('https://us-central1-key-line-454113-g0.cloudfunctions.net/getShipmentCodes?sheet=Closed', {
