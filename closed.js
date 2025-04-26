@@ -12,6 +12,11 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('bidder-id-display').textContent = `Bidder ID: ${maskedId}`;
   }
 
+  // Function to normalize job codes
+  function normalizeJobCode(code) {
+    return code.replace(/[-\s]+/g, '_');
+  }
+
   // Fetch closed shipments
   fetch('https://us-central1-key-line-454113-g0.cloudfunctions.net/getShipmentCodes?sheet=Closed', {
     method: 'GET',
@@ -28,9 +33,9 @@ document.addEventListener('DOMContentLoaded', () => {
   .then(data => {
     const shipments = data.shipments;
 
-    // Trim shipment data and process freightMethod
+    // Trim and normalize shipment data
     shipments.forEach(shipment => {
-      shipment.shipmentCode = shipment.shipmentCode.trim();
+      shipment.shipmentCode = normalizeJobCode(shipment.shipmentCode.trim());
       shipment.firstId = shipment.firstId.trim();
       if (shipment.freightMethod) {
         const parts = shipment.freightMethod.split(' - ');
@@ -105,7 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
     .then(bidData => {
       const allBids = bidData.bids.map(bid => ({
         bidderId: bid.bidderId.trim(),
-        jobCode: bid.jobCode.trim(),
+        jobCode: normalizeJobCode(bid.jobCode.trim()),
         bidValue: bid.bidValue
       }));
       console.log('All bids:', allBids);
@@ -167,6 +172,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function calculateSpread(bidderId, jobCode, winnerId, allBids) {
     console.log(`Calculating spread - Bidder: ${bidderId}, Job: ${jobCode}, Winner: ${winnerId}`);
+    console.log(`Bidder ID: ${bidderId}, Winner ID: ${winnerId}, Equal: ${bidderId === winnerId}`);
     try {
       const bidderBids = allBids.filter(bid => bid.bidderId === bidderId && bid.jobCode === jobCode);
       console.log(`Bidder bids:`, bidderBids);
