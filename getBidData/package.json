@@ -3,16 +3,11 @@
   "version": "1.0.0",
   "main": "getBidData.js",
   "dependencies": {
-    "@google-cloud/functions-framework": "^3.5.1"
+    "@google-cloud/functions-framework": "^3.5.1",
+    "googleapis": "^140.0.0",
+    "@google-cloud/secret-manager": "^5.0.0"
   },
   "engines": {
     "node": "20"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": ""
+  }
 }
