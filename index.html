@@ -16,6 +16,28 @@
             justify-content: center;
             align-items: center;
         }
+        .greeting {
+            max-width: 600px;
+            margin: 0 auto 20px auto;
+        }
+        .greeting p {
+            text-align: center;
+            font-size: 24px;
+            color: black;
+            text-shadow: 
+                -1px -1px 0 white,  
+                1px -1px 0 white,
+                -1px 1px 0 white,
+                1px 1px 0 white;
+            white-space: pre-line;
+            margin: 0;
+            font-weight: bold;
+        }
+        .separator {
+            border: none;
+            border-top: 1px solid #ccc;
+            margin: 20px 0;
+        }
         .login-container {
             display: flex;
             flex-direction: column;
@@ -48,9 +70,9 @@
             text-align: center;
             text-shadow: 
                 -1px -1px 0 white,  
-                 1px -1px 0 white,
-                -1px  1px 0 white,
-                 1px  1px 0 white;
+                1px -1px 0 white,
+                -1px 1px 0 white,
+                1px 1px 0 white;
         }
         .contact {
             margin-top: 20px;
@@ -68,6 +90,13 @@
     </style>
 </head>
 <body>
+    <div class="greeting">
+        <p>A simple secured e-bidding platform
+for the verified freight forwarders
+to obtain freight collect shipments
+from the verified vendors.</p>
+    </div>
+    <hr class="separator">
     <div class="login-container">
         <div class="login-box">
             <h2>Bidder ID</h2>
@@ -78,11 +107,12 @@
             <input type="password" id="verification-number" placeholder="Verify here" maxlength="4">
         </div>
     </div>
+    <hr class="separator">
     <div class="message" id="message"></div>
     <div class="contact">
-        Contact <a href="mailto:freight.ebidding@gmail.com">us</a> for any enquiry.
+        Contact <a href="/cdn-cgi/l/email-protection#5e382c3b3739362a703b3c373a3a3730391e39333f3732703d3133">us</a> for any enquiry.
     </div>
-    <script src="login.js"></script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="login.js"></script>
     <!-- Existing inline script for Cloudflare remains unchanged -->
-</body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9364b0e63b0e6746',t:'MTc0NTY1NTk0Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
