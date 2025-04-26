@@ -41,7 +41,7 @@
         .filters label {
             margin-right: 10px;
         }
-        .filters select {
+        .filters select, .filters input[type="date"] {
             margin-right: 20px;
             padding: 5px;
         }
@@ -99,6 +99,10 @@
             <select id="pod-filter">
                 <option value="">All</option>
             </select>
+            <label for="start-date">Start:</label>
+            <input type="date" id="start-date">
+            <label for="end-date">End:</label>
+            <input type="date" id="end-date">
         </div>
         <table id="closed-bid-table">
             <thead>

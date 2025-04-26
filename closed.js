@@ -12,12 +12,30 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('bidder-id-display').textContent = `Bidder ID: ${maskedId}`;
   }
 
-  // Function to mask ID for comparison
-  function maskIdForComparison(id) {
+  // Function to mask ID for display
+  function maskId(id) {
     if (id && id.length === 12) {
       return id.slice(0, 4) + '****' + id.slice(8);
     }
-    return id;
+    return id || 'N/A';
+  }
+
+  let shipmentsData = [];
+  let allBidsData = [];
+
+  // Function to parse date from "MMM/DD/YYYY" format
+  function parseDate(dateStr) {
+    const months = {
+      'Jan': 0, 'Feb': 1, 'Mar': 2, 'Apr': 3, 'May': 4, 'Jun': 5,
+      'Jul': 6, 'Aug': 7, 'Sep': 8, 'Oct': 9, 'Nov': 10, 'Dec': 11
+    };
+    const [monthAbbr, day, year] = dateStr.split('/');
+    const month = months[monthAbbr];
+    if (month === undefined) {
+      console.error(`Invalid month abbreviation: ${monthAbbr}`);
+      return null;
+    }
+    return new Date(year, month, day);
   }
 
   // Fetch closed shipments
@@ -34,10 +52,10 @@ document.addEventListener('DOMContentLoaded', () => {
     return response.json();
   })
   .then(data => {
-    const shipments = data.shipments;
+    shipmentsData = data.shipments;
 
-    // Trim shipment data and process freightMethod
-    shipments.forEach(shipment => {
+    // Process shipments: trim data and parse closing date
+    shipmentsData.forEach(shipment => {
       shipment.shipmentCode = shipment.shipmentCode.trim();
       shipment.firstId = shipment.firstId.trim();
       if (shipment.freightMethod) {
@@ -48,17 +66,22 @@ document.addEventListener('DOMContentLoaded', () => {
         shipment.freightMethodOnly = 'N/A';
         shipment.pod = 'N/A';
       }
+      if (shipment.closingDate) {
+        const datePart = shipment.closingDate.split(' ')[0]; // Extract "MMM/DD/YYYY"
+        shipment.closingDateObj = parseDate(datePart);
+      } else {
+        shipment.closingDateObj = null;
+      }
     });
 
-    console.log('Closed shipments:', shipments);
+    console.log('Closed shipments:', shipmentsData);
 
-    // Get unique values for filters
-    const uniqueWinners = [...new Set(shipments.map(s => s.firstId || 'N/A'))].sort();
-    const uniqueVendors = [...new Set(shipments.map(s => s.vendorDivision || 'N/A'))].sort();
-    const uniqueMethods = [...new Set(shipments.map(s => s.freightMethodOnly))].sort();
-    const uniquePods = [...new Set(shipments.map(s => s.pod))].sort();
+    // Populate filters with unique values
+    const uniqueWinners = [...new Set(shipmentsData.map(s => s.firstId || 'N/A'))].sort();
+    const uniqueVendors = [...new Set(shipmentsData.map(s => s.vendorDivision || 'N/A'))].sort();
+    const uniqueMethods = [...new Set(shipmentsData.map(s => s.freightMethodOnly))].sort();
+    const uniquePods = [...new Set(shipmentsData.map(s => s.pod))].sort();
 
-    // Populate drop-downs
     const winnerSelect = document.getElementById('winner-filter');
     uniqueWinners.forEach(winner => {
       const option = document.createElement('option');
@@ -91,11 +114,13 @@ document.addEventListener('DOMContentLoaded', () => {
       podSelect.appendChild(option);
     });
 
-    // Add event listeners to filters
-    winnerSelect.addEventListener('change', () => updateTable(shipments));
-    vendorSelect.addEventListener('change', () => updateTable(shipments));
-    methodSelect.addEventListener('change', () => updateTable(shipments));
-    podSelect.addEventListener('change', () => updateTable(shipments));
+    // Add event listeners to all filters
+    winnerSelect.addEventListener('change', updateTable);
+    vendorSelect.addEventListener('change', updateTable);
+    methodSelect.addEventListener('change', updateTable);
+    podSelect.addEventListener('change', updateTable);
+    document.getElementById('start-date').addEventListener('change', updateTable);
+    document.getElementById('end-date').addEventListener('change', updateTable);
 
     // Fetch bid data
     fetch('https://us-central1-key-line-454113-g0.cloudfunctions.net/getBidData', {
@@ -111,14 +136,13 @@ document.addEventListener('DOMContentLoaded', () => {
       return response.json();
     })
     .then(bidData => {
-      const allBids = bidData.bids.map(bid => ({
+      allBidsData = bidData.bids.map(bid => ({
         bidderId: bid.bidderId.trim(),
         jobCode: bid.jobCode.trim(),
         bidValue: bid.bidValue
       }));
-      console.log('All bids:', allBids);
-      // Initial table rendering with bid data
-      updateTable(shipments, allBids);
+      console.log('All bids:', allBidsData);
+      updateTable(); // Initial table rendering
     })
     .catch(error => {
       console.error('Error fetching bid data:', error);
@@ -130,22 +154,38 @@ document.addEventListener('DOMContentLoaded', () => {
     alert('Failed to load closed shipments. Please try again later.');
   });
 
-  function updateTable(shipments, allBids = []) {
+  // Update table based on filter selections
+  function updateTable() {
     const winnerSelect = document.getElementById('winner-filter');
     const vendorSelect = document.getElementById('vendor-filter');
     const methodSelect = document.getElementById('method-filter');
     const podSelect = document.getElementById('pod-filter');
+    const startDateInput = document.getElementById('start-date');
+    const endDateInput = document.getElementById('end-date');
 
     const selectedWinner = winnerSelect.value;
     const selectedVendor = vendorSelect.value;
     const selectedMethod = methodSelect.value;
     const selectedPod = podSelect.value;
+    const startDateStr = startDateInput.value;
+    const endDateStr = endDateInput.value;
 
-    const filteredShipments = shipments.filter(shipment => {
+    let startDate, endDate;
+    if (startDateStr) {
+      startDate = new Date(startDateStr);
+    }
+    if (endDateStr) {
+      endDate = new Date(endDateStr);
+    }
+
+    const filteredShipments = shipmentsData.filter(shipment => {
+      const dateCondition = (!startDate || (shipment.closingDateObj && shipment.closingDateObj >= startDate)) &&
+                            (!endDate || (shipment.closingDateObj && shipment.closingDateObj <= endDate));
       return (selectedWinner === '' || shipment.firstId === selectedWinner) &&
              (selectedVendor === '' || shipment.vendorDivision === selectedVendor) &&
              (selectedMethod === '' || shipment.freightMethodOnly === selectedMethod) &&
-             (selectedPod === '' || shipment.pod === selectedPod);
+             (selectedPod === '' || shipment.pod === selectedPod) &&
+             dateCondition;
     });
 
     const tbody = document.querySelector('#closed-bid-table tbody');
@@ -154,7 +194,7 @@ document.addEventListener('DOMContentLoaded', () => {
     filteredShipments.forEach(shipment => {
       const winner = maskId(shipment.firstId);
       const jobCode = shipment.shipmentCode;
-      const spread = calculateSpread(bidderId, jobCode, shipment.firstId, allBids);
+      const spread = calculateSpread(bidderId, jobCode, shipment.firstId);
       const row = document.createElement('tr');
       row.innerHTML = `
         <td>${shipment.closingDate || 'N/A'}</td>
@@ -173,38 +213,22 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  function calculateSpread(bidderId, jobCode, winnerId, allBids) {
-    const maskedBidderId = maskIdForComparison(bidderId);
-    console.log(`Calculating spread - Bidder: ${maskedBidderId}, Job: ${jobCode}, Winner: ${winnerId}`);
-    console.log(`Bidder ID: ${maskedBidderId}, Winner ID: ${winnerId}, Equal: ${maskedBidderId === winnerId}`);
+  // Calculate spread using full IDs
+  function calculateSpread(bidderId, jobCode, winnerId) {
     try {
-      const bidderBids = allBids.filter(bid => bid.bidderId === bidderId && bid.jobCode === jobCode);
-      console.log(`Bidder bids:`, bidderBids);
+      const bidderBids = allBidsData.filter(bid => bid.bidderId === bidderId && bid.jobCode === jobCode);
       if (bidderBids.length === 0) return 'No Bid';
-
-      if (maskedBidderId === winnerId) return 'Won';
-
+      if (bidderId === winnerId) return 'Won';
       const bidderLowestBid = Math.min(...bidderBids.map(bid => bid.bidValue));
-      const winningBids = allBids.filter(bid => maskIdForComparison(bid.bidderId) === winnerId && bid.jobCode === jobCode);
-      console.log(`Winning bids:`, winningBids);
+      const winningBids = allBidsData.filter(bid => bid.bidderId === winnerId && bid.jobCode === jobCode);
       if (winningBids.length === 0) return 'No Winning Bid';
-
       const winningBidValue = Math.min(...winningBids.map(bid => bid.bidValue));
-
       if (bidderLowestBid === winningBidValue) return '-';
-
       const spreadPercentage = ((bidderLowestBid - winningBidValue) / winningBidValue * 100).toFixed(2);
       return `${spreadPercentage}%`;
     } catch (error) {
       console.error('Error calculating spread:', error);
       return 'Error';
     }
-  }
-
-  function maskId(id) {
-    if (id && id.length === 12) {
-      return id.slice(0, 4) + '****' + id.slice(8);
-    }
-    return id || 'N/A';
   }
 });
