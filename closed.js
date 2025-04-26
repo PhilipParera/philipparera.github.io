@@ -28,8 +28,10 @@ document.addEventListener('DOMContentLoaded', () => {
   .then(data => {
     const shipments = data.shipments;
 
-    // Process freightMethod to extract method and POD
+    // Trim shipment data and process freightMethod
     shipments.forEach(shipment => {
+      shipment.shipmentCode = shipment.shipmentCode.trim();
+      shipment.firstId = shipment.firstId.trim();
       if (shipment.freightMethod) {
         const parts = shipment.freightMethod.split(' - ');
         shipment.freightMethodOnly = parts[0] ? parts[0].substring(0, 3) : 'N/A';
@@ -39,6 +41,8 @@ document.addEventListener('DOMContentLoaded', () => {
         shipment.pod = 'N/A';
       }
     });
+
+    console.log('Closed shipments:', shipments);
 
     // Get unique values for filters
     const uniqueWinners = [...new Set(shipments.map(s => s.firstId || 'N/A'))].sort();
@@ -99,7 +103,12 @@ document.addEventListener('DOMContentLoaded', () => {
       return response.json();
     })
     .then(bidData => {
-      const allBids = bidData.bids;
+      const allBids = bidData.bids.map(bid => ({
+        bidderId: bid.bidderId.trim(),
+        jobCode: bid.jobCode.trim(),
+        bidValue: bid.bidValue
+      }));
+      console.log('All bids:', allBids);
       // Initial table rendering with bid data
       updateTable(shipments, allBids);
     })
@@ -157,14 +166,20 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function calculateSpread(bidderId, jobCode, winnerId, allBids) {
+    console.log(`Calculating spread - Bidder: ${bidderId}, Job: ${jobCode}, Winner: ${winnerId}`);
     try {
       const bidderBids = allBids.filter(bid => bid.bidderId === bidderId && bid.jobCode === jobCode);
+      console.log(`Bidder bids:`, bidderBids);
       if (bidderBids.length === 0) return 'No Bid';
 
       if (bidderId === winnerId) return 'Won';
 
       const bidderLowestBid = Math.min(...bidderBids.map(bid => bid.bidValue));
-      const winningBidValue = Math.min(...allBids.filter(bid => bid.jobCode === jobCode && bid.bidderId === winnerId).map(bid => bid.bidValue));
+      const winningBids = allBids.filter(bid => bid.jobCode === jobCode && bid.bidderId === winnerId);
+      console.log(`Winning bids:`, winningBids);
+      if (winningBids.length === 0) return 'No Winning Bid';
+
+      const winningBidValue = Math.min(...winningBids.map(bid => bid.bidValue));
 
       if (bidderLowestBid === winningBidValue) return '-';
 
