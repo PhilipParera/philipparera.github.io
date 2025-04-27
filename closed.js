@@ -206,7 +206,7 @@ document.addEventListener('DOMContentLoaded', () => {
     filteredShipments.forEach(shipment => {
       const winner = maskId(shipment.firstId);
       const jobCode = shipment.shipmentCode;
-      const spread = calculateSpread(bidderId, jobCode, shipment.firstId);
+      const spread = calculateSpread(bidderId, jobCode, shipment.firstId, shipment.winningBidValue);
       const row = document.createElement('tr');
       row.innerHTML = `
         <td>${shipment.closingDate || 'N/A'}</td>
@@ -225,11 +225,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Calculate spread using full IDs with enhanced debugging logs
-  function calculateSpread(bidderId, jobCode, winnerId) {
-    console.log(`Calculating spread for bidder: ${maskId(bidderId)}, job: ${jobCode}, winner: ${maskId(winnerId)}`);
+  // Calculate spread using full IDs with winning bid value
+  function calculateSpread(bidderId, jobCode, winnerId, winningBidValue) {
+    console.log(`Calculating spread for bidder: ${maskId(bidderId)}, job: ${jobCode}, winner: ${maskId(winnerId)}, winningBid: ${winningBidValue}`);
     try {
-      // Normalize inputs for consistent comparison
       const normalizedJobCode = jobCode.trim();
       const normalizedBidderId = bidderId.trim();
       const normalizedWinnerId = winnerId.trim();
@@ -251,27 +250,18 @@ document.addEventListener('DOMContentLoaded', () => {
         return 'Won';
       }
 
-      const bidderLowestBid = Math.min(...bidderBids.map(bid => bid.bidValue));
-      console.log(`Bidder lowest bid: ${bidderLowestBid}`);
-
-      const winningBids = allBidsData.filter(bid => 
-        bid.bidderId.trim() === normalizedWinnerId && 
-        bid.jobCode.trim() === normalizedJobCode
-      );
-      console.log(`Winning bids for ${maskId(normalizedWinnerId)} on ${normalizedJobCode}:`, 
-        winningBids.map(bid => ({ ...bid, bidderId: maskId(bid.bidderId) })));
-
-      if (winningBids.length === 0) {
-        console.log(`No winning bids found for winner ${maskId(normalizedWinnerId)} on job ${normalizedJobCode}`);
+      const winningBid = parseFloat(winningBidValue);
+      if (isNaN(winningBid) || winningBid <= 0) {
+        console.log(`Invalid or missing winning bid value for job ${normalizedJobCode}: ${winningBidValue}`);
         return 'No Winning Bid';
       }
 
-      const winningBidValue = Math.min(...winningBids.map(bid => bid.bidValue));
-      console.log(`Winning bid value: ${winningBidValue}`);
+      const bidderLowestBid = Math.min(...bidderBids.map(bid => bid.bidValue));
+      console.log(`Bidder lowest bid: ${bidderLowestBid}, Winning bid: ${winningBid}`);
 
-      if (bidderLowestBid === winningBidValue) return '-';
+      if (bidderLowestBid === winningBid) return '-';
 
-      const spreadPercentage = ((bidderLowestBid - winningBidValue) / winningBidValue * 100).toFixed(2);
+      const spreadPercentage = ((bidderLowestBid - winningBid) / winningBid * 100).toFixed(2);
       return `${spreadPercentage}%`;
     } catch (error) {
       console.error('Error calculating spread:', error.message);
