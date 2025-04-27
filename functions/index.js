@@ -34,10 +34,22 @@ async function getJwtSecret() {
 }
 
 exports.authenticateBidder = async (req, res) => {
-  res.set('Access-Control-Allow-Origin', 'https://www.freight-ebidding.com');
+  // List of allowed origins
+  const allowedOrigins = ['https://www.freight-ebidding.com', 'https://freight-ebidding.com'];
+  const origin = req.headers.origin;
+
+  // Set the Access-Control-Allow-Origin header based on the request's origin
+  if (allowedOrigins.includes(origin)) {
+    res.set('Access-Control-Allow-Origin', origin);
+  } else {
+    // Default to freight-ebidding.com if origin is not recognized
+    res.set('Access-Control-Allow-Origin', 'https://freight-ebidding.com');
+  }
+
   res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.set('Access-Control-Allow-Headers', 'Content-Type');
 
+  // Handle preflight OPTIONS request
   if (req.method === 'OPTIONS') {
     return res.status(204).send('');
   }
