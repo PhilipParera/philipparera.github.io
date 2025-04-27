@@ -225,22 +225,52 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Calculate spread using full IDs with debugging logs
+  // Calculate spread using full IDs with enhanced debugging logs
   function calculateSpread(bidderId, jobCode, winnerId) {
     console.log(`Calculating spread for bidder: ${maskId(bidderId)}, job: ${jobCode}, winner: ${maskId(winnerId)}`);
     try {
-      const bidderBids = allBidsData.filter(bid => bid.bidderId === bidderId && bid.jobCode === jobCode);
-      console.log(`Bidder bids:`, bidderBids.map(bid => ({ ...bid, bidderId: maskId(bid.bidderId) })));
-      if (bidderBids.length === 0) return 'No Bid';
-      if (bidderId === winnerId) return 'Won';
+      // Normalize inputs for consistent comparison
+      const normalizedJobCode = jobCode.trim();
+      const normalizedBidderId = bidderId.trim();
+      const normalizedWinnerId = winnerId.trim();
+
+      const bidderBids = allBidsData.filter(bid => 
+        bid.bidderId.trim() === normalizedBidderId && 
+        bid.jobCode.trim() === normalizedJobCode
+      );
+      console.log(`Bidder bids for ${maskId(normalizedBidderId)} on ${normalizedJobCode}:`, 
+        bidderBids.map(bid => ({ ...bid, bidderId: maskId(bid.bidderId) })));
+
+      if (bidderBids.length === 0) {
+        console.log(`No bids found for bidder ${maskId(normalizedBidderId)} on job ${normalizedJobCode}`);
+        return 'No Bid';
+      }
+
+      if (normalizedBidderId === normalizedWinnerId) {
+        console.log(`Bidder ${maskId(normalizedBidderId)} is the winner for job ${normalizedJobCode}`);
+        return 'Won';
+      }
+
       const bidderLowestBid = Math.min(...bidderBids.map(bid => bid.bidValue));
       console.log(`Bidder lowest bid: ${bidderLowestBid}`);
-      const winningBids = allBidsData.filter(bid => bid.bidderId === winnerId && bid.jobCode === jobCode);
-      console.log(`Winning bids:`, winningBids.map(bid => ({ ...bid, bidderId: maskId(bid.bidderId) })));
-      if (winningBids.length === 0) return 'No Winning Bid';
+
+      const winningBids = allBidsData.filter(bid => 
+        bid.bidderId.trim() === normalizedWinnerId && 
+        bid.jobCode.trim() === normalizedJobCode
+      );
+      console.log(`Winning bids for ${maskId(normalizedWinnerId)} on ${normalizedJobCode}:`, 
+        winningBids.map(bid => ({ ...bid, bidderId: maskId(bid.bidderId) })));
+
+      if (winningBids.length === 0) {
+        console.log(`No winning bids found for winner ${maskId(normalizedWinnerId)} on job ${normalizedJobCode}`);
+        return 'No Winning Bid';
+      }
+
       const winningBidValue = Math.min(...winningBids.map(bid => bid.bidValue));
       console.log(`Winning bid value: ${winningBidValue}`);
+
       if (bidderLowestBid === winningBidValue) return '-';
+
       const spreadPercentage = ((bidderLowestBid - winningBidValue) / winningBidValue * 100).toFixed(2);
       return `${spreadPercentage}%`;
     } catch (error) {
