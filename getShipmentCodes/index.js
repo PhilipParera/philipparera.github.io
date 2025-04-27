@@ -98,6 +98,7 @@ functions.http('getShipmentCodes', async (req, res) => {
       openingDate: row[1] || '',
       closingDate: row[2] || '',
       target: row[6] || '',
+      winningBidValue: row[7] || '', // Added winning bid value from column H
       firstId: row[9] || '',
       secondId: row[10] || '',
       vendorDivision: row[15] || '',
