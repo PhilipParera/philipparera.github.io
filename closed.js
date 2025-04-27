@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('bidder-id-display').textContent = `Bidder ID: ${maskedId}`;
   }
 
-  // Function to mask ID for display and logging
+  // Function to mask ID for display
   function maskId(id) {
     if (id && id.length === 12) {
       return id.slice(0, 4) + '****' + id.slice(8);
@@ -33,7 +33,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const cleanedMonthAbbr = monthAbbr.replace(/\.$/, ''); // Remove trailing period
     const month = months[cleanedMonthAbbr];
     if (month === undefined) {
-      console.error(`Invalid month abbreviation: ${cleanedMonthAbbr}`);
       return null;
     }
     return new Date(year, month, day);
@@ -92,8 +91,6 @@ document.addEventListener('DOMContentLoaded', () => {
         shipment.closingDateStr = null;
       }
     });
-
-    console.log('Closed shipments:', shipmentsData);
 
     // Get unique values for filters
     const uniqueWinners = [...new Set(shipmentsData.map(s => s.firstId || 'N/A'))].sort();
@@ -161,16 +158,13 @@ document.addEventListener('DOMContentLoaded', () => {
         jobCode: bid.jobCode.trim(),
         bidValue: bid.bidValue
       }));
-      console.log('All bids:', allBidsData.map(bid => ({ ...bid, bidderId: maskId(bid.bidderId) })));
       updateTable(); // Initial table rendering
     })
     .catch(error => {
-      console.error('Error fetching bid data:', error);
       alert('Failed to load bid data. Please try again later.');
     });
   })
   .catch(error => {
-    console.error('Error fetching closed shipments:', error);
     alert('Failed to load closed shipments. Please try again later.');
   });
 
@@ -227,7 +221,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Calculate spread using full IDs with winning bid value
   function calculateSpread(bidderId, jobCode, winnerId, winningBidValue) {
-    console.log(`Calculating spread for bidder: ${maskId(bidderId)}, job: ${jobCode}, winner: ${maskId(winnerId)}, winningBid: ${winningBidValue}`);
     try {
       const normalizedJobCode = jobCode.trim();
       const normalizedBidderId = bidderId.trim();
@@ -237,34 +230,27 @@ document.addEventListener('DOMContentLoaded', () => {
         bid.bidderId.trim() === normalizedBidderId && 
         bid.jobCode.trim() === normalizedJobCode
       );
-      console.log(`Bidder bids for ${maskId(normalizedBidderId)} on ${normalizedJobCode}:`, 
-        bidderBids.map(bid => ({ ...bid, bidderId: maskId(bid.bidderId) })));
 
       if (bidderBids.length === 0) {
-        console.log(`No bids found for bidder ${maskId(normalizedBidderId)} on job ${normalizedJobCode}`);
         return 'No Bid';
       }
 
       if (normalizedBidderId === normalizedWinnerId) {
-        console.log(`Bidder ${maskId(normalizedBidderId)} is the winner for job ${normalizedJobCode}`);
         return 'Won';
       }
 
       const winningBid = parseFloat(winningBidValue);
       if (isNaN(winningBid) || winningBid <= 0) {
-        console.log(`Invalid or missing winning bid value for job ${normalizedJobCode}: ${winningBidValue}`);
         return 'No Winning Bid';
       }
 
       const bidderLowestBid = Math.min(...bidderBids.map(bid => bid.bidValue));
-      console.log(`Bidder lowest bid: ${bidderLowestBid}, Winning bid: ${winningBid}`);
 
       if (bidderLowestBid === winningBid) return '-';
 
       const spreadPercentage = ((bidderLowestBid - winningBid) / winningBid * 100).toFixed(2);
       return `${spreadPercentage}%`;
     } catch (error) {
-      console.error('Error calculating spread:', error.message);
       return 'Error';
     }
   }
