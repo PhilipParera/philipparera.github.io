@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('bidder-id-display').textContent = `Bidder ID: ${maskedId}`;
   }
 
-  // Function to mask ID for display
+  // Function to mask ID for display and logging
   function maskId(id) {
     if (id && id.length === 12) {
       return id.slice(0, 4) + '****' + id.slice(8);
@@ -161,7 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
         jobCode: bid.jobCode.trim(),
         bidValue: bid.bidValue
       }));
-      console.log('All bids:', allBidsData);
+      console.log('All bids:', allBidsData.map(bid => ({ ...bid, bidderId: maskId(bid.bidderId) })));
       updateTable(); // Initial table rendering
     })
     .catch(error => {
@@ -225,21 +225,26 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Calculate spread using full IDs
+  // Calculate spread using full IDs with debugging logs
   function calculateSpread(bidderId, jobCode, winnerId) {
+    console.log(`Calculating spread for bidder: ${maskId(bidderId)}, job: ${jobCode}, winner: ${maskId(winnerId)}`);
     try {
       const bidderBids = allBidsData.filter(bid => bid.bidderId === bidderId && bid.jobCode === jobCode);
+      console.log(`Bidder bids:`, bidderBids.map(bid => ({ ...bid, bidderId: maskId(bid.bidderId) })));
       if (bidderBids.length === 0) return 'No Bid';
       if (bidderId === winnerId) return 'Won';
       const bidderLowestBid = Math.min(...bidderBids.map(bid => bid.bidValue));
+      console.log(`Bidder lowest bid: ${bidderLowestBid}`);
       const winningBids = allBidsData.filter(bid => bid.bidderId === winnerId && bid.jobCode === jobCode);
+      console.log(`Winning bids:`, winningBids.map(bid => ({ ...bid, bidderId: maskId(bid.bidderId) })));
       if (winningBids.length === 0) return 'No Winning Bid';
       const winningBidValue = Math.min(...winningBids.map(bid => bid.bidValue));
+      console.log(`Winning bid value: ${winningBidValue}`);
       if (bidderLowestBid === winningBidValue) return '-';
       const spreadPercentage = ((bidderLowestBid - winningBidValue) / winningBidValue * 100).toFixed(2);
       return `${spreadPercentage}%`;
     } catch (error) {
-      console.error('Error calculating spread:', error);
+      console.error('Error calculating spread:', error.message);
       return 'Error';
     }
   }
