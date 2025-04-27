@@ -13,7 +13,15 @@ async function getKey() {
 }
 
 functions.http('getBidData', async (req, res) => {
-  res.set('Access-Control-Allow-Origin', 'https://www.freight-ebidding.com');
+  const allowedOrigins = ['https://www.freight-ebidding.com', 'https://freight-ebidding.com'];
+  const origin = req.headers.origin;
+
+  if (allowedOrigins.includes(origin)) {
+    res.set('Access-Control-Allow-Origin', origin);
+  } else {
+    res.set('Access-Control-Allow-Origin', 'https://freight-ebidding.com');
+  }
+
   res.set('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
