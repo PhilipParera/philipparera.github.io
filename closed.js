@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
   .then(data => {
     shipmentsData = data.shipments;
 
-    // Process shipments: trim data, parse freight method, and handle closing date
+    // Process shipments: trim data, parse freight method, handle closing date, and add COO
     shipmentsData.forEach(shipment => {
       shipment.shipmentCode = shipment.shipmentCode.trim();
       shipment.firstId = shipment.firstId.trim();
@@ -90,6 +90,10 @@ document.addEventListener('DOMContentLoaded', () => {
         shipment.closingDateObj = null;
         shipment.closingDateStr = null;
       }
+      // Add COO
+      const pol = shipment.pol || '';
+      const polParts = pol.split(',');
+      shipment.coo = polParts.length > 1 ? polParts[polParts.length - 1].trim().slice(-2) : 'N/A';
     });
 
     // Get unique values for filters
@@ -97,6 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const uniqueVendors = [...new Set(shipmentsData.map(s => s.vendorDivision || 'N/A'))].sort();
     const uniqueMethods = [...new Set(shipmentsData.map(s => s.freightMethodOnly))].sort();
     const uniquePods = [...new Set(shipmentsData.map(s => s.pod))].sort();
+    const uniqueCoos = [...new Set(shipmentsData.map(s => s.coo))].sort();
 
     // Populate drop-downs
     const winnerSelect = document.getElementById('winner-filter');
@@ -131,11 +136,20 @@ document.addEventListener('DOMContentLoaded', () => {
       podSelect.appendChild(option);
     });
 
+    const cooSelect = document.getElementById('coo-filter');
+    uniqueCoos.forEach(coo => {
+      const option = document.createElement('option');
+      option.value = coo;
+      option.textContent = coo;
+      cooSelect.appendChild(option);
+    });
+
     // Add event listeners to filters
     winnerSelect.addEventListener('change', updateTable);
     vendorSelect.addEventListener('change', updateTable);
     methodSelect.addEventListener('change', updateTable);
     podSelect.addEventListener('change', updateTable);
+    cooSelect.addEventListener('change', updateTable);
     document.getElementById('start-date').addEventListener('change', updateTable);
     document.getElementById('end-date').addEventListener('change', updateTable);
 
@@ -185,6 +199,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const vendorSelect = document.getElementById('vendor-filter');
     const methodSelect = document.getElementById('method-filter');
     const podSelect = document.getElementById('pod-filter');
+    const cooSelect = document.getElementById('coo-filter');
     const startDateInput = document.getElementById('start-date');
     const endDateInput = document.getElementById('end-date');
 
@@ -192,6 +207,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const selectedVendor = vendorSelect.value;
     const selectedMethod = methodSelect.value;
     const selectedPod = podSelect.value;
+    const selectedCoo = cooSelect.value;
     const startDateStr = startDateInput.value;
     const endDateStr = endDateInput.value;
 
@@ -202,6 +218,7 @@ document.addEventListener('DOMContentLoaded', () => {
              (selectedVendor === '' || shipment.vendorDivision === selectedVendor) &&
              (selectedMethod === '' || shipment.freightMethodOnly === selectedMethod) &&
              (selectedPod === '' || shipment.pod === selectedPod) &&
+             (selectedCoo === '' || shipment.coo === selectedCoo) &&
              dateCondition;
     });
 
@@ -212,21 +229,29 @@ document.addEventListener('DOMContentLoaded', () => {
       const winner = maskId(shipment.firstId);
       const jobCode = shipment.shipmentCode;
       const spread = calculateSpread(bidderId, jobCode, shipment.firstId, shipment.winningBidValue);
-      const row = document.createElement('tr');
-      row.innerHTML = `
-        <td>${shipment.closingDate || 'N/A'}</td>
-        <td>${winner}</td>
-        <td>${spread}</td>
+      const coo = shipment.coo;
+
+      const row1 = document.createElement('tr');
+      row1.innerHTML = `
+        <td rowspan="2">${shipment.closingDate || 'N/A'}</td>
+        <td rowspan="2">${winner}</td>
+        <td rowspan="2">${spread}</td>
         <td>${shipment.vendorDivision || 'N/A'}</td>
         <td>${shipment.freightMethod || 'N/A'}</td>
+        <td rowspan="2">${coo}</td>
+        <td>${shipment.gwKg || 'N/A'}</td>
+        <td rowspan="2" class="wrapped-text">${shipment.shipperAddress || 'N/A'}</td>
+        <td rowspan="2">${jobCode}</td>
+      `;
+      tbody.appendChild(row1);
+
+      const row2 = document.createElement('tr');
+      row2.innerHTML = `
         <td>${shipment.incoterm || 'N/A'}</td>
         <td>${shipment.pol || 'N/A'}</td>
-        <td>${shipment.gwKg || 'N/A'}</td>
         <td>${shipment.volCbm || 'N/A'}</td>
-        <td class="wrapped-text">${shipment.shipperAddress || 'N/A'}</td>
-        <td>${jobCode}</td>
       `;
-      tbody.appendChild(row);
+      tbody.appendChild(row2);
     });
   }
 
