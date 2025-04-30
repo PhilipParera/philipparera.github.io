@@ -233,7 +233,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const row1 = document.createElement('tr');
       row1.innerHTML = `
-        <td rowspan="2">${shipment.closingDate || 'N/A'}</td>
+        <td rowspan="2">${shipment.closingDateStr || 'N/A'}</td>
         <td rowspan="2">${winner}</td>
         <td rowspan="2">${spread}</td>
         <td>${shipment.vendorDivision || 'N/A'}</td>
