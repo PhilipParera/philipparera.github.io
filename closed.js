@@ -96,6 +96,14 @@ document.addEventListener('DOMContentLoaded', () => {
       shipment.coo = polParts.length > 1 ? polParts[polParts.length - 1].trim().slice(-2) : 'N/A';
     });
 
+    // Sort shipmentsData by closingDateObj descending
+    shipmentsData.sort((a, b) => {
+      if (a.closingDateObj === null && b.closingDateObj === null) return 0;
+      if (a.closingDateObj === null) return 1;
+      if (b.closingDateObj === null) return -1;
+      return b.closingDateObj - a.closingDateObj;
+    });
+
     // Get unique values for filters
     const uniqueWinners = [...new Set(shipmentsData.map(s => s.firstId || 'N/A'))].sort();
     const uniqueVendors = [...new Set(shipmentsData.map(s => s.vendorDivision || 'N/A'))].sort();
