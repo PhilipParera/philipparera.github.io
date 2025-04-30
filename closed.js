@@ -163,6 +163,17 @@ document.addEventListener('DOMContentLoaded', () => {
     .catch(error => {
       alert('Failed to load bid data. Please try again later.');
     });
+
+    // Add exit button functionality
+    const exitButton = document.getElementById('exit-button');
+    if (exitButton) {
+      exitButton.addEventListener('click', () => {
+        localStorage.removeItem('jwtToken');
+        localStorage.removeItem('bidderId');
+        localStorage.removeItem('userName');
+        window.location.href = 'index.html';
+      });
+    }
   })
   .catch(error => {
     alert('Failed to load closed shipments. Please try again later.');

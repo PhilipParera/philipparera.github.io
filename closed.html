@@ -24,6 +24,10 @@
             position: absolute;
             top: 10px;
             right: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 10px; /* Space between button and link */
         }
         .content {
             margin-top: 50px;
@@ -73,11 +77,23 @@
             white-space: normal;
             word-wrap: break-word;
         }
+        #exit-button {
+            background-color: #808080;
+            border: 1px solid black;
+            box-shadow: 2px 2px 5px grey;
+            font-family: Tahoma, sans-serif;
+            font-weight: bold;
+            color: #00FF00;
+            text-shadow: 0 0 5px #00FF00, 0 0 10px #00FF00, 0 0 15px #00FF00;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
     <div class="bidder-id" id="bidder-id-display"></div>
     <div class="return-button">
+        <button id="exit-button">EXIT</button>
         <a href="main.html">Return to Main Page</a>
     </div>
     <div class="content">
@@ -110,8 +126,8 @@
                     <th>Closed Date</th>
                     <th>Winner</th>
                     <th>Spread %</th>
-                    <th>Vendor - Division</th>
-                    <th>Freight Method - POD</th>
+                    <th>Vendor</th>
+                    <th>Freight - POD</th>
                     <th>Incoterm</th>
                     <th>POL</th>
                     <th>GW (Kg)</th>
@@ -126,5 +142,5 @@
         </table>
     </div>
     <script src="closed.js"></script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9383085a1b2c0711',t:'MTc0NTk3NDA5Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>

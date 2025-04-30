@@ -87,6 +87,17 @@ document.addEventListener('DOMContentLoaded', () => {
       console.error('Error fetching shipments:', error);
       alert('Failed to load shipments. Please try again later.');
     });
+
+    // Add exit button functionality
+    const exitButton = document.getElementById('exit-button');
+    if (exitButton) {
+      exitButton.addEventListener('click', () => {
+        localStorage.removeItem('jwtToken');
+        localStorage.removeItem('bidderId');
+        localStorage.removeItem('userName');
+        window.location.href = 'index.html';
+      });
+    }
   }
 
   function updateTable(shipments) {

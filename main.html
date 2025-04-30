@@ -74,10 +74,31 @@
             white-space: normal;
             word-wrap: break-word;
         }
+        #exit-button {
+            background-color: #808080;
+            border: 1px solid black;
+            box-shadow: 2px 2px 5px grey;
+            font-family: Tahoma, sans-serif;
+            font-weight: bold;
+            color: #00FF00;
+            text-shadow: 0 0 5px #00FF00, 0 0 10px #00FF00, 0 0 15px #00FF00;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        .top-right-container {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 10px; /* Space between button and link */
+        }
     </style>
 </head>
 <body>
-    <div style="position: absolute; top: 10px; right: 10px;">
+    <div class="top-right-container">
+        <button id="exit-button">EXIT</button>
         <a href="closed.html">>>> List of Closed Jobs</a>
     </div>
     <div class="bidder-id" id="bidder-id-display"></div>
@@ -103,8 +124,8 @@
                     <th>ALL-IN Rate<br>Bid Value (IDR)</th>
                     <th>Target Rate (IDR) /<br>Potential Winner /<br>Runner-up</th>
                     <th>Opening /<br>Closing Date</th>
-                    <th>Vendor - Division</th>
-                    <th>Freight - POD /<br>Incoterm / POL</th>
+                    <th>Vendor</th>
+                    <th>Freight Method - POD /<br>Incoterm / POL</th>
                     <th>GW-CW (Kg) /<br>Vol. (Cbm)</th>
                     <th>Shipper's Address</th>
                     <th>Job Code</th>
@@ -116,5 +137,5 @@
         </table>
     </div>
     <script src="main.js"></script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9383085a4ca0827e',t:'MTc0NTk3NDA5Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
