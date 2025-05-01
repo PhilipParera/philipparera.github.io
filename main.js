@@ -48,18 +48,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Parse closingDate in "MMM/DD/YYYY and time" format to YYYY-MM-DD
         if (shipment.closingDate) {
-          const datePart = shipment.closingDate.split(' ')[0]; // Extract "MMM/DD/YYYY"
-          const dateParts = datePart.split('/');
-          if (dateParts.length === 3) {
-            const [monthAbbr, day, year] = dateParts;
-            const monthMap = {
-              'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04', 'May': '05', 'Jun': '06',
-              'Jul': '07', 'Aug': '08', 'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12'
-            };
-            const monthNum = monthMap[monthAbbr];
-            if (monthNum && day && year && /^\d{1,2}$/.test(day) && /^\d{4}$/.test(year)) {
-              const formattedDay = day.padStart(2, '0');
-              shipment.closingDateParsed = `${year}-${monthNum}-${formattedDay}`;
+          const parts = shipment.closingDate.split(' ');
+          if (parts.length >= 3) {
+            const monthAbbr = parts[0].replace(/\.$/, ''); // Remove trailing period if present
+            const day = parts[1].replace(/,$/, '');       // Remove trailing comma if present
+            const year = parts[2];
+            const dateStr = `${monthAbbr}/${day}/${year}`;
+            const parsedDate = parseDate(dateStr);
+            if (parsedDate) {
+              const yearNum = parsedDate.getFullYear();
+              const monthNum = String(parsedDate.getMonth() + 1).padStart(2, '0');
+              const dayNum = String(parsedDate.getDate()).padStart(2, '0');
+              shipment.closingDateParsed = `${yearNum}-${monthNum}-${dayNum}`;
             } else {
               shipment.closingDateParsed = null;
             }
@@ -136,6 +136,19 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location.href = 'index.html';
       });
     }
+  }
+
+  function parseDate(dateStr) {
+    const months = {
+      'Jan': 0, 'Feb': 1, 'Mar': 2, 'Apr': 3, 'May': 4, 'Jun': 5,
+      'Jul': 6, 'Aug': 7, 'Sep': 8, 'Oct': 9, 'Nov': 10, 'Dec': 11
+    };
+    const [monthAbbr, day, year] = dateStr.split('/');
+    const month = months[monthAbbr];
+    if (month === undefined || isNaN(day) || isNaN(year)) {
+      return null;
+    }
+    return new Date(year, month, day);
   }
 
   function updateTable(shipments) {
