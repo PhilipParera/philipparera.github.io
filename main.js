@@ -49,8 +49,13 @@ document.addEventListener('DOMContentLoaded', () => {
         // Parse closingDate to extract only the date part and convert to YYYY-MM-DD
         if (shipment.closingDate) {
           const datePart = shipment.closingDate.split(' ')[0]; // Extract "mm/dd/yyyy" before "and time"
-          const [month, day, year] = datePart.split('/');
-          shipment.closingDateParsed = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+          const dateParts = datePart.split('/');
+          if (dateParts.length === 3 && dateParts.every(part => /^\d+$/.test(part))) {
+            const [month, day, year] = dateParts;
+            shipment.closingDateParsed = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+          } else {
+            shipment.closingDateParsed = null;
+          }
         } else {
           shipment.closingDateParsed = null;
         }
