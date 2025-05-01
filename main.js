@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
               'Jul': '07', 'Aug': '08', 'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12'
             };
             const monthNum = monthMap[monthAbbr];
-            if (monthNum && /^\d{1,2}$/.test(day) && /^\d{4}$/.test(year)) {
+            if (monthNum && day && year && /^\d{1,2}$/.test(day) && /^\d{4}$/.test(year)) {
               const formattedDay = day.padStart(2, '0');
               shipment.closingDateParsed = `${year}-${monthNum}-${formattedDay}`;
             } else {
@@ -151,12 +151,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const selectedPod = podSelect.value;
     const selectedCoo = cooSelect.value;
     const closeStart = closeStartInput.value;
-    const closeEnd = closeEndInput.value;
+    const closeEnd = closeEndInput.value || closeStart; // Default to closeStart if closeEnd is empty
 
     // Filter shipments based on selected values
     const filteredShipments = shipments.filter(shipment => {
-      const dateCondition = (!closeStart || (shipment.closingDateParsed && shipment.closingDateParsed >= closeStart)) &&
-                            (!closeEnd || (shipment.closingDateParsed && shipment.closingDateParsed <= closeEnd));
+      const hasValidDate = shipment.closingDateParsed !== null;
+      let dateCondition = true;
+
+      if (closeStart || closeEnd) {
+        if (!hasValidDate) return false; // Exclude shipments with null dates when filtering by date
+        const start = closeStart || shipment.closingDateParsed; // Use shipment date if no start
+        const end = closeEnd || shipment.closingDateParsed;   // Use shipment date if no end
+        dateCondition = shipment.closingDateParsed >= start && shipment.closingDateParsed <= end;
+      }
+
       return (selectedVendor === '' || shipment.vendorDivision === selectedVendor) &&
              (selectedMethod === '' || shipment.freightMethodOnly === selectedMethod) &&
              (selectedPod === '' || shipment.pod === selectedPod) &&
