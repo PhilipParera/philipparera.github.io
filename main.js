@@ -46,13 +46,23 @@ document.addEventListener('DOMContentLoaded', () => {
         const pol = shipment.pol || '';
         shipment.coo = pol.slice(-2);
 
-        // Parse closingDate to extract only the date part and convert to YYYY-MM-DD
+        // Parse closingDate in "MMM/DD/YYYY and time" format to YYYY-MM-DD
         if (shipment.closingDate) {
-          const datePart = shipment.closingDate.split(' ')[0]; // Extract "mm/dd/yyyy" before "and time"
+          const datePart = shipment.closingDate.split(' ')[0]; // Extract "MMM/DD/YYYY"
           const dateParts = datePart.split('/');
-          if (dateParts.length === 3 && dateParts.every(part => /^\d+$/.test(part))) {
-            const [month, day, year] = dateParts;
-            shipment.closingDateParsed = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+          if (dateParts.length === 3) {
+            const [monthAbbr, day, year] = dateParts;
+            const monthMap = {
+              'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04', 'May': '05', 'Jun': '06',
+              'Jul': '07', 'Aug': '08', 'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12'
+            };
+            const monthNum = monthMap[monthAbbr];
+            if (monthNum && /^\d{1,2}$/.test(day) && /^\d{4}$/.test(year)) {
+              const formattedDay = day.padStart(2, '0');
+              shipment.closingDateParsed = `${year}-${monthNum}-${formattedDay}`;
+            } else {
+              shipment.closingDateParsed = null;
+            }
           } else {
             shipment.closingDateParsed = null;
           }
