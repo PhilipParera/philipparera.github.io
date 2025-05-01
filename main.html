@@ -36,7 +36,7 @@
         .filters label {
             margin-right: 10px;
         }
-        .filters select {
+        .filters select, .filters input[type="date"] {
             margin-right: 20px;
             padding: 5px;
         }
@@ -117,15 +117,24 @@
             <select id="pod-filter">
                 <option value="">All</option>
             </select>
+            <label for="coo-filter">COO:</label>
+            <select id="coo-filter">
+                <option value="">All</option>
+            </select>
+            <label for="close-start">Close date: Start</label>
+            <input type="date" id="close-start">
+            <label for="close-end">End</label>
+            <input type="date" id="close-end">
         </div>
         <table id="bid-table">
             <thead>
                 <tr>
                     <th>ALL-IN Rate<br>Bid Value (IDR)</th>
                     <th>Target Rate (IDR) /<br>Potential Winner /<br>Runner-up</th>
-                    <th>Opening /<br>Closing Date</th>
+                    <th>Open - Close Date</th>
                     <th>Vendor</th>
                     <th>Freight Method - POD /<br>Incoterm / POL</th>
+                    <th>COO</th>
                     <th>GW-CW (Kg) /<br>Vol. (Cbm)</th>
                     <th>Shipper's Address</th>
                     <th>Job Code</th>

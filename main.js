@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
     .then(data => {
       const shipments = data.shipments;
 
-      // Process shipments to extract freightMethodOnly and pod
+      // Process shipments to extract freightMethodOnly, pod, coo, and parse closingDate
       shipments.forEach(shipment => {
         if (shipment.freightMethod) {
           const parts = shipment.freightMethod.split(' - ');
@@ -43,12 +43,24 @@ document.addEventListener('DOMContentLoaded', () => {
           shipment.freightMethodOnly = 'N/A';
           shipment.pod = 'N/A';
         }
+        const pol = shipment.pol || '';
+        shipment.coo = pol.slice(-2);
+
+        // Parse closingDate to extract only the date part and convert to YYYY-MM-DD
+        if (shipment.closingDate) {
+          const datePart = shipment.closingDate.split(' ')[0]; // Extract "mm/dd/yyyy" before "and time"
+          const [month, day, year] = datePart.split('/');
+          shipment.closingDateParsed = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+        } else {
+          shipment.closingDateParsed = null;
+        }
       });
 
       // Get unique values for filters
       const uniqueVendors = [...new Set(shipments.map(s => s.vendorDivision || 'N/A'))].sort();
       const uniqueMethods = [...new Set(shipments.map(s => s.freightMethodOnly))].sort();
       const uniquePods = [...new Set(shipments.map(s => s.pod))].sort();
+      const uniqueCoos = [...new Set(shipments.map(s => s.coo))].sort();
 
       // Populate drop-downs
       const vendorSelect = document.getElementById('vendor-filter');
@@ -75,10 +87,21 @@ document.addEventListener('DOMContentLoaded', () => {
         podSelect.appendChild(option);
       });
 
+      const cooSelect = document.getElementById('coo-filter');
+      uniqueCoos.forEach(coo => {
+        const option = document.createElement('option');
+        option.value = coo;
+        option.textContent = coo;
+        cooSelect.appendChild(option);
+      });
+
       // Add event listeners to filters
       vendorSelect.addEventListener('change', () => updateTable(shipments));
       methodSelect.addEventListener('change', () => updateTable(shipments));
       podSelect.addEventListener('change', () => updateTable(shipments));
+      cooSelect.addEventListener('change', () => updateTable(shipments));
+      document.getElementById('close-start').addEventListener('change', () => updateTable(shipments));
+      document.getElementById('close-end').addEventListener('change', () => updateTable(shipments));
 
       // Initial table rendering
       updateTable(shipments);
@@ -104,16 +127,26 @@ document.addEventListener('DOMContentLoaded', () => {
     const vendorSelect = document.getElementById('vendor-filter');
     const methodSelect = document.getElementById('method-filter');
     const podSelect = document.getElementById('pod-filter');
+    const cooSelect = document.getElementById('coo-filter');
+    const closeStartInput = document.getElementById('close-start');
+    const closeEndInput = document.getElementById('close-end');
 
     const selectedVendor = vendorSelect.value;
     const selectedMethod = methodSelect.value;
     const selectedPod = podSelect.value;
+    const selectedCoo = cooSelect.value;
+    const closeStart = closeStartInput.value;
+    const closeEnd = closeEndInput.value;
 
     // Filter shipments based on selected values
     const filteredShipments = shipments.filter(shipment => {
+      const dateCondition = (!closeStart || (shipment.closingDateParsed && shipment.closingDateParsed >= closeStart)) &&
+                            (!closeEnd || (shipment.closingDateParsed && shipment.closingDateParsed <= closeEnd));
       return (selectedVendor === '' || shipment.vendorDivision === selectedVendor) &&
              (selectedMethod === '' || shipment.freightMethodOnly === selectedMethod) &&
-             (selectedPod === '' || shipment.pod === selectedPod);
+             (selectedPod === '' || shipment.pod === selectedPod) &&
+             (selectedCoo === '' || shipment.coo === selectedCoo) &&
+             dateCondition;
     });
 
     // Update table
@@ -132,6 +165,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <td rowspan="3">Open: ${shipment.openingDate}<br>Close: ${shipment.closingDate}</td>
         <td rowspan="3">${shipment.vendorDivision || 'N/A'}</td>
         <td>${shipment.freightMethod || 'N/A'}</td>
+        <td rowspan="3">${shipment.coo}</td>
         <td>${shipment.gwKg || 'N/A'}</td>
         <td rowspan="3" class="wrapped-text">${shipment.shipperAddress || 'N/A'}</td>
         <td rowspan="3">${shipment.shipmentCode}</td>
