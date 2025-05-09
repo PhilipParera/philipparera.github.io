@@ -62,6 +62,9 @@
             z-index: 1;
             padding: 5px; /* Slimmer rows */
         }
+        .second-header-row th {
+            top: 30px; /* Adjust based on the actual height of the first row */
+        }
         /* Updated row colors: alternate every two rows per shipment */
         tbody tr:nth-child(4n-3), tbody tr:nth-child(4n-2) {
             background-color: white;
@@ -138,7 +141,7 @@
                     <th rowspan="2">Seller/Shipper Detail</th>
                     <th rowspan="2">Job Code</th>
                 </tr>
-                <tr>
+                <tr class="second-header-row">
                     <th>Incoterm</th>
                     <th>POL</th>
                     <th>Vol. (Cbm)</th>
@@ -150,5 +153,5 @@
         </table>
     </div>
     <script src="closed.js"></script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'93d1732a3b2d4532',t:'MTc0Njc5NjM2MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
